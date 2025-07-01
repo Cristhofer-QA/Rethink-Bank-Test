@@ -66,7 +66,7 @@ function generateCpf(withPunctuation, withLetter, validLength) {
 
 // Internet
 function generateEmail() {
-    return faker.internet.email();
+    return faker.internet.email().toLowerCase();
 };
 
 function generatePassword(lengthPassword = 8, useLowercaseLetter, useCapitalLetter, useNumber, useAccentuation, useSpecialChars) {
@@ -103,7 +103,7 @@ function generatePassword(lengthPassword = 8, useLowercaseLetter, useCapitalLett
 
 // Number
 function generateNumber(min, max) {
-    return faker.number.int(min, max);
+    return faker.number.int({ min: min, max: max });
 };
 
 
@@ -137,7 +137,7 @@ module.exports = {
     generateEmail,
     generatePassword,
     generateCpf,
-    
+
     generateNumber,
     generateString,
     generateAccentedChar,
