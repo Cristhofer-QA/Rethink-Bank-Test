@@ -1,0 +1,21 @@
+{
+  "name": "jest-cucumber",
+  "version": "1.0.0",
+  "description": "Projeto de testes de API com Jest, Cucumber e Supertest.",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm install",
+    "test": "jest",
+    "run-all": "npm run setup && npm test && npm run report"
+  },
+  "keywords": [],
+  "author": "Cristhofer Mian",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^17.0.0",
+    "jest": "^29.7.0",
+    "jest-cucumber": "^4.5.0",
+    "jest-html-reporter": "^4.3.0",
+    "supertest": "^7.1.1"
+  }
+}
