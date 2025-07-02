@@ -23,7 +23,9 @@ jobs:
       - name: Configurar ambiente
         env:
           API_BASE_URL: ${{ vars.API_BASE_URL }}  
-        run: echo "API_BASE_URL=${API_BASE_URL}" > .env
+        run: |
+          echo "::add-mask::${{ vars.API_BASE_URL }}"
+          echo API_BASE_URL=${{ vars.API_BASE_URL }} > .env
 
       - name: Executar testes
         run: npm test
