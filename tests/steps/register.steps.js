@@ -4,13 +4,11 @@ const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Regis
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
+const generator = require('../../generators/baseGenerator');
+const featureVar = require('../../variables/featuresVariables')
 
 
 defineFeature(feature, (test) => {
-    const registerSuccess = require('../../variables/register/registerUserSuccessVariable');
-    const registerCpfAlreadyRegistered = require('../../variables/register/registerUserCpfAlreadyRegisteredVariable');
-    const registerEmailAlreadyRegistered = require('../../variables/register/registerUserEmailAlreadyRegisteredVariable');
-
     const successRegistrationMessage = 'Cadastro realizado com sucesso.';
     const cpfInvalidMessage = 'CPF inválido';
     const passwordInvalidMessage = 'Senha fraca';
@@ -22,14 +20,14 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com dados válidos", ({ given, when, then, and }) => {
         let send, response;
-        const cnpj = registerSuccess.cpf;
-        const fullName = registerSuccess.full_name;
-        const email = registerSuccess.email;
-        const password = registerSuccess.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
         given("que possuo todos os dados para o cadastro de usuário", () => {
-            send = sendRegister(cnpj, fullName, email, password, confirmPassword);
+            send = sendRegister(cpf, fullName, email, password, confirmPassword);
         });
 
         when("realizo a requisição de cadastro com todos os dados válidos", async () => {
@@ -54,21 +52,21 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com CPF já cadastrado", ({ given, when, then, and }) => {
         let send, response;
-        const cnpj = registerCpfAlreadyRegistered.cpf;
-        const fullName = registerCpfAlreadyRegistered.fullName;
-        const email = registerCpfAlreadyRegistered.email;
-        const password = registerCpfAlreadyRegistered.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
-        const cnpjAlreadyRegistered = registerCpfAlreadyRegistered.cpf;
-        const fullNameAlreadyRegistered = registerCpfAlreadyRegistered.fullNameUserAlreadyRegistered;
-        const emailAlreadyRegistered = registerCpfAlreadyRegistered.emailUserAlreadyRegistered;
-        const passwordAlreadyRegistered = registerCpfAlreadyRegistered.passwordUserAlreadyRegistered;
+        const cpfAlreadyRegistered = cpf;
+        const fullNameAlreadyRegistered = generator.generateName(featureVar.fullNameValid);
+        const emailAlreadyRegistered = generator.generateEmail(featureVar.emailValid);
+        const passwordAlreadyRegistered = generator.generatePassword(featureVar.emailValid);
         const confirmPasswordAlreadyRegistered = passwordAlreadyRegistered;
 
         given("que eu possua o CPF de um usuário já cadastrado", async () => {
             const sendAlreadyRegistered = sendRegister(
-                cnpjAlreadyRegistered,
+                cpfAlreadyRegistered,
                 fullNameAlreadyRegistered,
                 emailAlreadyRegistered,
                 passwordAlreadyRegistered,
@@ -78,7 +76,7 @@ defineFeature(feature, (test) => {
             if (res.status !== 201) {
                 throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
             }
-            send = sendRegister(cnpj, fullName, email, password, confirmPassword);
+            send = sendRegister(cpf, fullName, email, password, confirmPassword);
         });
 
         when("realizo a requisição de cadastro informando o CPF já cadastrado", async () => {
@@ -97,21 +95,21 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com email já cadastrado", ({ given, when, then, and }) => {
         let send, response;
-        const cnpj = registerEmailAlreadyRegistered.cpf;
-        const fullName = registerEmailAlreadyRegistered.fullName;
-        const email = registerEmailAlreadyRegistered.email;
-        const password = registerEmailAlreadyRegistered.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
-        const cnpjAlreadyRegistered = registerEmailAlreadyRegistered.cpfUserAlreadyRegistered;
-        const fullNameAlreadyRegistered = registerEmailAlreadyRegistered.fullNameUserAlreadyRegistered;
-        const emailAlreadyRegistered = registerEmailAlreadyRegistered.email;
-        const passwordAlreadyRegistered = registerEmailAlreadyRegistered.passwordUserAlreadyRegistered;
+        const cpfAlreadyRegistered = generator.generateCpf(featureVar.cpfValid);
+        const fullNameAlreadyRegistered = generator.generateName(featureVar.fullNameValid);
+        const emailAlreadyRegistered = email;
+        const passwordAlreadyRegistered = generator.generatePassword(featureVar.emailValid);
         const confirmPasswordAlreadyRegistered = passwordAlreadyRegistered;
 
         given("que eu possua o email de um usuário já cadastrado", async () => {
             const sendAlreadyRegistered = sendRegister(
-                cnpjAlreadyRegistered,
+                cpfAlreadyRegistered,
                 fullNameAlreadyRegistered,
                 emailAlreadyRegistered,
                 passwordAlreadyRegistered,
@@ -121,7 +119,7 @@ defineFeature(feature, (test) => {
             if (res.status !== 201) {
                 throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
             }
-            send = sendRegister(cnpj, fullName, email, password, confirmPassword);
+            send = sendRegister(cpf, fullName, email, password, confirmPassword);
         });
 
         when("realizo a requisição de cadastro informando o email já cadastrado", async () => {
@@ -141,8 +139,14 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com CPF inválido - <scenario>", ({ given, when, then, and }) => {
         let send, response;
-        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com CPF inválido$/, (cpf, full_name, email, password, confirm_password) => {
-            send = sendRegister(cpf, full_name, email, password, confirm_password);
+        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com CPF inválido$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder) => {
+            const cpf = generator.generateCpf(cpfPlaceholder);
+            const email = generator.generateEmail(emailPlaceholder);
+            const fullName = generator.generateName(fullNamePlaceholder);
+            const password = generator.generatePassword(passwordPlaceholder);
+
+            send = sendRegister(cpf, fullName, email, password, password);
+            console.log(send)
         });
 
         when("realizo a requisição de cadastro com o CPF inválido", async () => {
@@ -162,8 +166,13 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com full_name invalido - <scenario>", ({ given, when, then, and }) => {
         let send, response;
-        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com Full Name inválido$/, (cpf, full_name, email, password, confirm_password) => {
-            send = sendRegister(cpf, full_name, email, password, confirm_password);
+        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com Full Name inválido$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder) => {
+            const cpf = generator.generateCpf(cpfPlaceholder);
+            const email = generator.generateEmail(emailPlaceholder);
+            const fullName = generator.generateName(fullNamePlaceholder);
+            const password = generator.generatePassword(passwordPlaceholder);
+            send = sendRegister(cpf, fullName, email, password, password);
+            console.log(send);
         });
 
         when("realizo a requisição de cadastro com o full_name invalido", async () => {
@@ -183,8 +192,13 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com email invalido - <scenario>", ({ given, when, then, and }) => {
         let send, response;
-        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com email inválido$/, (cpf, full_name, email, password, confirm_password) => {
-            send = sendRegister(cpf, full_name, email, password, confirm_password);
+        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com email inválido$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder) => {
+            const cpf = generator.generateCpf(cpfPlaceholder);
+            const email = generator.generateEmail(emailPlaceholder);
+            const fullName = generator.generateName(fullNamePlaceholder);
+            const password = generator.generatePassword(passwordPlaceholder);
+            send = sendRegister(cpf, fullName, email, password, password);
+            console.log(send);
         });
 
         when("realizo a requisição de cadastro com o full_name invalido", async () => {
@@ -202,11 +216,20 @@ defineFeature(feature, (test) => {
         });
     });
 
-
     test("Cadastro com senha inválida - <scenario>", ({ given, when, then, and }) => {
         let send, response;
-        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com senha inválida$/, (cpf, full_name, email, password, confirm_password) => {
-            send = sendRegister(cpf, full_name, email, password, confirm_password);
+        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com senha inválida$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder) => {
+            const cpf = generator.generateCpf(cpfPlaceholder);
+
+            const email = generator.generateEmail(emailPlaceholder);
+
+            const fullName = generator.generateName(fullNamePlaceholder);
+            const password = generator.generatePassword(passwordPlaceholder);
+
+            send = sendRegister(cpf, fullName, email, password, password);
+
+            console.log(passwordPlaceholder)
+            console.log(send)
         });
 
         when("realizo a requisição de cadastro com senha inválida", async () => {
@@ -227,8 +250,18 @@ defineFeature(feature, (test) => {
 
     test("Cadastro com confirmação de senha inválida - <scenario>", ({ given, when, then, and }) => {
         let send, response;
-        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com confirmação de senha inválida$/, (cpf, full_name, email, password, confirm_password) => {
-            send = sendRegister(cpf, full_name, email, password, confirm_password);
+        given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com confirmação de senha inválida$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder, passwordConfirmPlaceholder) => {
+            const cpf = generator.generateCpf(cpfPlaceholder);
+
+            const email = generator.generateEmail(emailPlaceholder);
+
+            const fullName = generator.generateName(fullNamePlaceholder);
+            const password = generator.generatePassword(passwordPlaceholder);
+            const passwordConfirm = generator.returnPasswordConfirm(passwordConfirmPlaceholder, password);
+
+            send = sendRegister(cpf, fullName, email, password, passwordConfirm);
+
+            console.log(send)
         });
 
         when("realizo a requisição de cadastro com confirmação de senha inválida", async () => {

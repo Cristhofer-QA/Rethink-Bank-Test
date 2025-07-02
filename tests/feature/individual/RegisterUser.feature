@@ -20,63 +20,64 @@ Feature: Cadastro de usuário
     And o status da resposta deve ser 400 para o email já está cadastrado
 
   Scenario Outline: Cadastro com CPF inválido - <scenario>
-    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<confirm_password>" pra cadastro com CPF inválido
+    Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com CPF inválido
     When realizo a requisição de cadastro com o CPF inválido
     Then a responta deve conter um erro para o CPF inválido
     And o status da resposta deve ser 400 para o CPF inválido
 
     Examples:
-      | scenario              | cpf            | full_name     | email              | password    | confirm_password |
-      | CPF com menos dígitos |         123456 | João da Silva | j_silva@xpto.com   | Teste01@    | Teste01@         |
-      | CPF com pontuação     | 785.541.236-99 | Fábio Pasquim | f_pasquim@xpto.com | aSdGa25!!@  | aSdGa25!!@       |
-      | CPF com letra         |    9875622145A | Roger Bento   | g_bento@xpto.com   | fd@%448fACX | fd@%448fACX      |
-      | Sem CPF               |                | Pedro Roberto | p.roberto@xpto.com | fdAW2#@#    | fdAW2#@#         |
+      | scenario              | cpf                  | full_name           | email           | password           |
+      | CPF com menos dígitos | ${CPF_MENOS_DIG}     | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
+      | CPF com pontuação     | ${CPF_COM_PONTUACAO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
+      | CPF com letra         | ${CPF_COM_LETRA}     | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
+      | Sem CPF               | ${NULL)              | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
 
   Scenario Outline: Cadastro com full_name invalido - <scenario>
-    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<confirm_password>" pra cadastro com Full Name inválido
+    Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com Full Name inválido
     When realizo a requisição de cadastro com o full_name invalido
     Then a responta deve conter um erro para o full_name invalido
     And o status da resposta deve ser 400 para o full_name invalido
 
     Examples:
-      | scenario                    | cpf         | full_name | email              | password   | confirm_password |
-      | Full Name só com uma string | 98747852444 | João      | j_silva@xpto.com   | tsCa4d22@  | tsCa4d22@        |
-      | Sem Full Name               | 89874110259 |           | f_pasquim@xpto.com | aSdGa25!!@ | aSdGa25!!@       |
+      | scenario                    | cpf           | full_name        | email           | password           |
+      | Full Name só com uma string | ${CPF_VALIDO} | ${NOME_UNITARIO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
+      | Sem Full Name               | ${CPF_VALIDO} | ${NULL)          | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} |
 
   Scenario Outline: Cadastro com email invalido - <scenario>
-    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<confirm_password>" pra cadastro com email inválido
+    Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com email inválido
     When realizo a requisição de cadastro com o full_name invalido
     Then a responta deve conter um erro para o full_name invalido
     And o status da resposta deve ser 400 para o full_name invalido
 
     Examples:
-      | scenario    | cpf         | full_name  | email               | password    | confirm_password |
-      | Email sem @ | 98747852444 | João Souza | j_souza1exemplo.com | tsaCa4d22@  | tsaCa4d22@       |
-      | Sem email   | 78985669878 | Fábio Lins |                     | aSdGda25!!@ | aSdGda25!!@      |
+      | scenario       | cpf           | full_name           | email                | password           |
+      | Email sem @    | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_SEM_ARROBA}  | ${PASSWORD_VALIDA} |
+      | Email sem .com | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_SEM_DOT_COM} | ${PASSWORD_VALIDA} |
+      | Sem email      | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${NULL)              | ${PASSWORD_VALIDA} |
 
   Scenario Outline: Cadastro com senha inválida - <scenario>
-    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<confirm_password>" pra cadastro com senha inválida
+    Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com senha inválida
     When realizo a requisição de cadastro com senha inválida
     Then a responta deve conter um erro com senha inválida
     And o status da resposta deve ser 400 com senha inválida
 
     Examples:
-      | scenario                     | cpf         | full_name       | email                 | password  | confirm_password |
-      | Senha com menos de 8 dígitos | 78554115225 | João Souza      | j_souza1@exemplo.com  | Ca4d22@   | Ca4d22@          |
-      | Senha sem letra minúscula    | 98889668558 | Fábio Gustavo   | g.g@xpto.com          | FS#ADD15@ | FS#ADD15@        |
-      | Senha sem letra maiúscula    | 00145887444 | Gustavo Paulo   | gp@xpto.com           | sr4!!@cdc | sr4!!@cdc        |
-      | Senha sem caractere especial | 72555525520 | Jorge Rodrigues | jj_rogr1gues@xpto.com | saAwfWW5  | saAwfWW5         |
-      | Senha sem número             | 98838521185 | Joana D' Ávida  | jssdsasv@xpto.com     | iIkUjJJd@ | iIkUjJJd@        |
-      | Sem senha                    | 01158855487 | Talis Pereira   | talis_p1@xpto.com     |           |                  |
+      | scenario                     | cpf           | full_name           | email           | password                           |
+      | Senha com menos de 8 dígitos | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_MENOS_DIG}              |
+      | Senha sem letra minúscula    | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_SEM_MINUSCULA}          |
+      | Senha sem letra maiúscula    | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_SEM_MAIUSCULA}          |
+      | Senha sem caractere especial | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_SEM_CARACTERE_ESPECIAL} |
+      | Senha sem número             | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_SEM_NUMERO}             |
+      | Sem senha                    | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${NULL)                            |
 
   Scenario Outline: Cadastro com confirmação de senha inválida - <scenario>
-    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<confirm_password>" pra cadastro com confirmação de senha inválida
+    Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<password_confirm>" pra cadastro com confirmação de senha inválida
     When realizo a requisição de cadastro com confirmação de senha inválida
     Then a responta deve conter um erro com confirmação de senha inválida
     And o status da resposta deve ser 400 com confirmação de senha inválida
 
     Examples:
-      | scenario                        | cpf         | full_name     | email                | password   | confirm_password |
-      | Senha de confirmação diferente  | 01154115225 | João Souza    | j_souza1@exemplo.com | CaA4d22@   | Ca4d22c@         |
-      | Senha de confirmação não válida | 98559668558 | Fábio Gustavo | g.g@xpto.com         | FS#azD15@  | FS#AZD15@        |
-      | Sem senha de confirmação        | 58965087444 | Gustavo Paulo | gp@xpto.com          | sAr4!!@cdc |                  |
+      | scenario                        | cpf           | full_name           | email           | password           | password_confirm              |
+      | Senha de confirmação diferente  | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} | ${PASSWORD_CONFIRM_DIFERENTE} |
+      | Senha de confirmação não válida | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} | ${PASSWORD_CONFIRM_INVALIDA}  |
+      | Sem senha de confirmação        | ${CPF_VALIDO} | ${FULL_NAME_VALIDO} | ${EMAIL_VALIDO} | ${PASSWORD_VALIDA} | ${NULL)                       |

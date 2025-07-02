@@ -1,5 +1,5 @@
 const { faker } = require('@faker-js/faker');
-
+const featureVar = require('../variables/featuresVariables')
 
 const alphabet = [
     'a', 'b', 'c', 'd', 'e', 'f', 'g',
@@ -14,17 +14,6 @@ const specialCharacters = [
     '-', '_', '+', '=', '{', '}', '[', ']', '|', '\\',
     ':', ';', '"', "'", '<', '>', ',', '.', '?', '/'
 ];
-
-
-const accentedLetters = [
-    'á', 'à', 'â', 'ã', 'ä', 'å',
-    'é', 'è', 'ê', 'ë',
-    'í', 'ì', 'î', 'ï',
-    'ó', 'ò', 'ô', 'õ', 'ö',
-    'ú', 'ù', 'û', 'ü',
-    'ç'
-];
-
 
 
 // Person
@@ -48,26 +37,121 @@ function generateOneName() {
     return firstName.split(" ")[0];
 };
 
-
-function generateCpf(withPunctuation, withLetter, validLength) {
-    let cpf = "";
-    while (cpf.length < 11) {
-        cpf = cpf + generateNumber(0, 9);
+function generateName(typeName) {
+    switch (typeName) {
+        case featureVar.fullNameValid:
+            return generateFullName();
+        case featureVar.oneName:
+            return generateOneName();
+        case featureVar.fullNameWithNumber:
+            return generateFullName() + generateNumber(0, 9);
+        case featureVar.null:
+            return null;
     };
+};
+
+
+function generateCpf(typeCpf) {
+    withPunctuation = false;
+    withLetter = false
+
+    let length = 11;
+    let cpf = faker.string.numeric(length);
+
+    switch (typeCpf) {
+        case featureVar.cpfMinusDigit:
+            length = 6;
+            cpf = faker.string.numeric(length);
+            break;
+
+        case featureVar.cpfWithPunctuation:
+            withPunctuation = true;
+            break;
+
+        case featureVar.cpfWithLetter:
+            withLetter = true;
+            break;
+
+        case featureVar.null:
+            return null;
+
+        case featureVar.cpfValid:
+        default:
+            break;
+    };
+
+    if (withPunctuation && length === 11) {
+        cpf = `${cpf.slice(0, 3)}.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-${cpf.slice(9)}`;
+    };
+
+    if (withLetter) {
+        const randomLetter = faker.string.alpha(1).toUpperCase();
+        cpf = cpf.slice(0, length - 1) + randomLetter;
+    };
+
     return cpf;
 };
 
 
-
 // Internet
-function generateEmail() {
-    return faker.internet.email().toLowerCase();
+function generateEmail(typeEmail) {
+    const email = faker.internet.email().toLowerCase();
+    switch (typeEmail) {
+        case featureVar.emailValid:
+            return email;
+        case featureVar.emailInvalid:
+            return email.replace('@', '');
+        case featureVar.emailWithoutDotCom:
+            return email.replace(/\.[a-z]{2,3}$/, '');
+        case featureVar.null:
+            return null;
+    };
 };
 
+function returnPasswordConfirm(typePassword, password) {
+    const passwordStr = `${password}`;
+    switch(typePassword){
+        case(featureVar.passwordConfirmDifferent):
+            return passwordStr.toUpperCase();
+        case(featureVar.passwordConfirmInvalid):
+            return generatePassword(featureVar.passwordWithoutNumber)
+        case(featureVar.null):
+            return null;
+    };
+}
 
-function generatePassword(lengthPassword = 8, useLowercaseLetter, useCapitalLetter, useNumber, useAccentuation, useSpecialChars) {
+
+function generatePassword(typePassword, lengthPassword = 8) {
+    let length = lengthPassword
+    let useNumber = true;
+    let useSpecialChars = true;
+    let useCapitalLetter = true;
+    let useLowercaseLetter = true;
+
+
+    switch (typePassword) {
+        case featureVar.passwordMinusDigit:
+            length = 6;
+            break;
+        case featureVar.passwordNoCapitalLetter:
+            useCapitalLetter = false;
+            break;
+        case featureVar.passwordNoLowercaseLetter:
+            useLowercaseLetter = false;
+            break;
+        case featureVar.passwordWithoutCharSpecial:
+            useSpecialChars = false;
+            break;
+        case featureVar.passwordWithoutNumber:
+            useNumber = false;
+            break;
+        case featureVar.null:
+            return null;
+    }
+
+
     let passwordReturn = "";
-    while (passwordReturn.length < lengthPassword) {
+    while (passwordReturn.length < length) {
         if (useLowercaseLetter) {
             passwordReturn = passwordReturn + generateString(1);
         };
@@ -84,14 +168,8 @@ function generatePassword(lengthPassword = 8, useLowercaseLetter, useCapitalLett
             passwordReturn = passwordReturn + generateSpecialCharacter();
 
         };
-
-        if (useAccentuation) {
-            passwordReturn = passwordReturn + generateAccentedChar();
-
-        };
     };
-
-    return passwordReturn.slice(0, lengthPassword);
+    return passwordReturn.slice(0, length);
 
 };
 
@@ -114,7 +192,7 @@ function generateString(length = 10, capitalLetter = false) {
     if (capitalLetter) {
         return stringReturn.toUpperCase();
     } else {
-        return stringReturn.toLocaleLowerCase();
+        return stringReturn.toLowerCase();
     };
 };
 
@@ -137,6 +215,8 @@ module.exports = {
     generateEmail,
     generatePassword,
     generateCpf,
+    generateName,
+    returnPasswordConfirm,
 
     generateNumber,
     generateString,

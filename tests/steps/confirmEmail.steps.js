@@ -4,23 +4,21 @@ const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Confi
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
+const featureVar = require('../../variables/featuresVariables');
+const generator = require('../../generators/baseGenerator');
+
 
 defineFeature(feature, (test) => {
-
-    const confirmEmailSuccess = require('../../variables/confirmEmail/confirmEmailCorrectVariable');
-    const confirmEmailAlreadyConfirmed = require('../../variables/confirmEmail/confirmEmailAlreadyConfirmedVariable');
-    const confirmEmailInvalidToken = require('../../variables/confirmEmail/confirmEmailInvalidTokenVariable');
-    const confirmEmailWithoutToken = require('../../variables/confirmEmail/confirmEmailWithoutTokenVariable');
     const confirmEmailSuccessMessage = 'E-mail confirmado com sucesso.';
     const confirmTokenExpiredMessage = 'Token inválido ou expirado.';
 
     test("Confirmação correta de e-mail", ({ given, when, then, and }) => {
         let response, token;
 
-        const cpf = confirmEmailSuccess.cpf;
-        const fullName = confirmEmailSuccess.fullName;
-        const email = confirmEmailSuccess.email;
-        const password = confirmEmailSuccess.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
         given('que tenho um usuário cadastrado que não possua e-mail confirmado', async () => {
@@ -50,10 +48,10 @@ defineFeature(feature, (test) => {
     test("Confirmar um e-mail já confirmado", ({ given, when, then, and }) => {
         let responseConfirm, token;
 
-        const cpf = confirmEmailAlreadyConfirmed.cpf;
-        const fullName = confirmEmailAlreadyConfirmed.fullName;
-        const email = confirmEmailAlreadyConfirmed.email;
-        const password = confirmEmailAlreadyConfirmed.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
         given('que tenha um usuário cadastrado com um e-mail já confirmado', async () => {
@@ -83,13 +81,13 @@ defineFeature(feature, (test) => {
 
     });
 
-     test("Confirmar um e-mail com um token inválido", ({ given, when, then, and }) => {
+    test("Confirmar um e-mail com um token inválido", ({ given, when, then, and }) => {
         let response, token;
 
-        const cpf = confirmEmailInvalidToken.cpf;
-        const fullName = confirmEmailInvalidToken.fullName;
-        const email = confirmEmailInvalidToken.email;
-        const password = confirmEmailInvalidToken.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
         given('que tenha um usuário cadastrado e com o token retornado', async () => {
@@ -118,10 +116,10 @@ defineFeature(feature, (test) => {
         let response;
 
         const token = null;
-        const cpf = confirmEmailWithoutToken.cpf;
-        const fullName = confirmEmailWithoutToken.fullName;
-        const email = confirmEmailWithoutToken.email;
-        const password = confirmEmailWithoutToken.password;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
         const confirmPassword = password;
 
         given('que tenha um usuário cadastrado e com o token retornado (validação sem token)', async () => {
