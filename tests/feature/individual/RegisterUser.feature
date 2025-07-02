@@ -7,6 +7,12 @@ Feature: Cadastro de usuário
     And a resposta deve conter o campo confirmToken
     And o status da resposta deve ser 201
 
+  Scenario: Cadastro de usuário corretamente e verificação dos 100 pontos iniciais
+    Given que possua um usuário cadastrado e confirmado o email
+    When consulto o saldo geral dele
+    Then a consulta deve retornar 100 pontos como resultado
+    And o status da consulta deve ser 200
+
   Scenario: Cadastro com CPF já cadastrado
     Given que eu possua o CPF de um usuário já cadastrado
     When realizo a requisição de cadastro informando o CPF já cadastrado

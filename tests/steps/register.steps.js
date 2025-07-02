@@ -4,6 +4,7 @@ const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Regis
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
+const { send: sendLogin } = endpoints.login;
 const generator = require('../../generators/baseGenerator');
 const featureVar = require('../../variables/featuresVariables')
 
@@ -46,6 +47,60 @@ defineFeature(feature, (test) => {
 
         and("o status da resposta deve ser 201", () => {
             expect(response.status).toBe(201);
+        });
+
+    });
+
+
+
+    test("Cadastro de usuário corretamente e verificação dos 100 pontos iniciais", ({ given, when, then, and }) => {
+        let send, response, bearerToken, token;
+        const cpf = generator.generateCpf(featureVar.cpfValid);
+        const fullName = generator.generateName(featureVar.fullNameValid);
+        const email = generator.generateEmail(featureVar.emailValid);
+        const password = generator.generatePassword(featureVar.emailValid);
+        const confirmPassword = password;
+
+        given("que possua um usuário cadastrado e confirmado o email", async () => {
+            send = sendRegister(cpf, fullName, email, password, confirmPassword);
+            response = await utils.registerUser(send);
+            if (response.status !== 201) {
+                throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
+            }
+
+            token = response.body.confirmToken;
+
+            const resConfirm = await utils.confirmEmail(token);
+            if (resConfirm.status !== 200) {
+                throw new Error("Não foi possível continuar o cenário, pois a verificação do e-mail falhou.")
+            }
+
+            const bodyLogin = sendLogin(email, password);
+            const resLogin = await utils.login(bodyLogin);
+            if (resLogin.status !== 200) {
+                throw new Error("Não foi possível continuar o cenário, pois o login falhou!.")
+            }
+            bearerToken = resLogin.body.token;
+        });
+
+        when("consulto o saldo geral dele", async () => {
+            response = await utils.generalBalance(bearerToken);
+            console.log(response.status)
+            console.log(response.body)
+        });
+
+
+
+
+        then("a consulta deve retornar 100 pontos como resultado", () => {
+            expect(response.body).toHaveProperty('normal_balance');
+            expect(response.body).toHaveProperty('piggy_bank_balance');
+            expect(response.body.normal_balance).toBe(100);
+            expect(response.body.piggy_bank_balance).toBe(0);
+        });
+
+        and("o status da consulta deve ser 200", () => {
+            expect(response.status).toBe(200);
         });
 
     });

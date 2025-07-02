@@ -29,4 +29,9 @@ module.exports = {
         method: 'get',
         path: '/confirm-email'
     },
+
+    general_balance: {
+        method: 'get',
+        path: '/points/saldo'
+    },
 };
