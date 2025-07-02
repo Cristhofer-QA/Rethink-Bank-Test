@@ -1,7 +1,11 @@
-name: Run API Tests Manually
+name: API Tests CI
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Permite execução manual
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   api-tests:
@@ -9,25 +13,28 @@ jobs:
 
     steps:
       - name: Checkout do repositório
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Instalar Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'  # Habilita cache para instalação mais rápida
 
       - name: Instalar dependências
-        run: npm ci
+        run: npm ci 
 
-      - name: Verificar variável de ambiente
+      - name: Configurar ambiente
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}  
         run: |
-          echo "API Base URL: $API_BASE_URL"
+          echo "API_BASE_URL=${API_BASE_URL}" > .env
 
       - name: Executar testes
-        run: npm run run-all
+        run: npm test
 
-      - name: Exportar relatório de testes
-        if: always()
+      - name: Publicar relatório de testes
+        if: always()  # Executa mesmo se os testes falharem
         uses: actions/upload-artifact@v4
         with:
           name: test-report
