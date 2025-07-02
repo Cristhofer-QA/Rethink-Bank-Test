@@ -1,1 +1,0 @@
-# Logar com um usuário, excluí-lo e logar novamente com ele

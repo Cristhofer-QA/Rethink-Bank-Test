@@ -30,6 +30,7 @@ npm run run-all
 
 3. Ao tentar fazer login (/login) e enviar a senha com o valor NULL, está retornando erro 500. Mas se enviar uma string vazia, ai o sistema valida e retorna um erro de credencial (esperado). Já se enviar ambos os campos null (email e senha), também validado como credencial inválida.
 
+4. O mesmo 'erro' do ponto 3 acontece para o endpoint de exclusão de usuário (/account).
 
 
 ## Erros encontrados
