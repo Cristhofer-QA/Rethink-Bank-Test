@@ -4,6 +4,7 @@ const createClient = require('./client');
 const { method: methodLogin, path: pathLogin, send: sendLogin } = endpoints.login;
 const { method: methodAccount, path: pathAccount, send: sendAccount } = endpoints.account;
 const { method: methodRegister, path: pathRegister, send: sendRegister } = endpoints.register;
+const { method: methodConfirmEmail, path: pathConfirmEmail } = endpoints.confirm_email;
 
 
 async function account(send, token = null) {
@@ -24,9 +25,16 @@ async function registerUser(send) {
     return response;
 }
 
+async function confirmEmail(token) {
+    const client = createClient(token);
+    const response = await client[methodConfirmEmail](pathConfirmEmail);
+    return response;
+}
+
 
 module.exports = {
     account,
     login,
-    registerUser
+    registerUser,
+    confirmEmail
 };

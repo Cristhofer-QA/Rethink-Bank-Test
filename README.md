@@ -4,6 +4,8 @@ Repositório criado para realização de testes de API utilizando Jest, Cucumber
 
 ---
 
+
+
 ## Como rodar o projeto
 
 Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
@@ -12,6 +14,8 @@ Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
 npm run run-all
 
 ```
+
+
 ---
 ## Anotações
 
@@ -21,6 +25,7 @@ porém o erro retornado é estranho. Como se não fosse tratado. O mesmo acontec
 ```bash
     {"error": "duplicate key value violates unique constraint \"users_cpf_key\""}
 ```
+
 
 ## Erros encontrados
 

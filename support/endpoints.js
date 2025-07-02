@@ -25,4 +25,8 @@ module.exports = {
             password: passwordSend
         })
     },
+    confirm_email: {
+        method: 'get',
+        path: '/confirm-email'
+    },
 };

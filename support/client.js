@@ -3,18 +3,19 @@ const supertest = require('supertest');
 function createClient(token = null) {
     const client = supertest(process.env.API_BASE_URL);
 
-    const applyToken = (req) => {
-        if (token !== null) {
-            req.set('Authorization', `Bearer ${token}`);
+    const appendTokenToUrl = (path) => {
+        if (token) {
+            const separator = path.includes('?') ? '&' : '?';
+            return `${path}${separator}token=${token}`;
         }
-        return req;
+        return path;
     };
 
     return {
-        get: (path) => applyToken(client.get(path)),
-        post: (path) => applyToken(client.post(path)),
-        delete: (path) => applyToken(client.delete(path))
+        get: (path) => client.get(appendTokenToUrl(path)),
+        post: (path) => client.post(appendTokenToUrl(path)),
+        delete: (path) => client.delete(appendTokenToUrl(path))
     };
-};
+}
 
 module.exports = createClient;
