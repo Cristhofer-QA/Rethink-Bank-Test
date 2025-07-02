@@ -38,7 +38,7 @@ defineFeature(feature, (test) => {
     });
 
 
-    test.skip("Login com usuário cadastrado e validado", ({ given, when, then, and }) => {
+    test("Login com usuário cadastrado e validado", ({ given, when, then, and }) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
@@ -70,7 +70,7 @@ defineFeature(feature, (test) => {
 
     });
 
-    test.skip("Login com usuário cadastrado e não validado", ({ given, when, then, and }) => {
+    test("Login com usuário cadastrado e não validado", ({ given, when, then, and }) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email não confirmado", async () => {
@@ -97,7 +97,7 @@ defineFeature(feature, (test) => {
     });
 
 
-    test.skip("Login com campos incorretos - <scenario>", ({ given, when, then, and }) => {
+    test("Login com campos incorretos - <scenario>", ({ given, when, then, and }) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
@@ -145,7 +145,7 @@ defineFeature(feature, (test) => {
 
     });
 
-    test.skip("Login com campos inválidos - <scenario>", ({ given, when, then, and }) => {
+    test("Login com campos inválidos - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
             if (!userCreated) {
@@ -192,7 +192,7 @@ defineFeature(feature, (test) => {
     });
 
 
-    test.skip("Login com campos nulos - <scenario>", ({ given, when, then, and }) => {
+    test("Login com campos nulos - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
             if (!userCreated) {
@@ -246,7 +246,7 @@ defineFeature(feature, (test) => {
 
     });
 
-    test.skip("Login com campos vazios - <scenario>", ({ given, when, then, and }) => {
+    test("Login com campos vazios - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
             if (!userCreated) {
