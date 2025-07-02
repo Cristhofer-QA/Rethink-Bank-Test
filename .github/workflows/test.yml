@@ -19,6 +19,10 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Verificar variável de ambiente
+        run: |
+          echo "API Base URL: $API_BASE_URL"
+
       - name: Executar testes
         run: npm run run-all
 
