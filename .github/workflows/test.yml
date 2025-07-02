@@ -1,11 +1,7 @@
 name: API Tests CI
 
 on:
-  workflow_dispatch:  # Permite execução manual
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   api-tests:
@@ -26,9 +22,15 @@ jobs:
 
       - name: Configurar ambiente
         env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}  
+          API_BASE_URL: ${{ vars.API_BASE_URL }}  
         run: |
           echo "API_BASE_URL=${API_BASE_URL}" > .env
+          echo "Conteúdo do .env:"
+          grep -o 'API_BASE_URL=[^ ]*' .env | sed 's/=.*/=***/'
+
+      - name: Verificar conexão com a API
+        run: |
+          curl -I ${API_BASE_URL} || true  # Testa se a API está acessível
 
       - name: Executar testes
         run: npm test
