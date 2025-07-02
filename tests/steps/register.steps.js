@@ -146,7 +146,6 @@ defineFeature(feature, (test) => {
             const password = generator.generatePassword(passwordPlaceholder);
 
             send = sendRegister(cpf, fullName, email, password, password);
-            console.log(send)
         });
 
         when("realizo a requisição de cadastro com o CPF inválido", async () => {
@@ -172,7 +171,6 @@ defineFeature(feature, (test) => {
             const fullName = generator.generateName(fullNamePlaceholder);
             const password = generator.generatePassword(passwordPlaceholder);
             send = sendRegister(cpf, fullName, email, password, password);
-            console.log(send);
         });
 
         when("realizo a requisição de cadastro com o full_name invalido", async () => {
@@ -198,7 +196,6 @@ defineFeature(feature, (test) => {
             const fullName = generator.generateName(fullNamePlaceholder);
             const password = generator.generatePassword(passwordPlaceholder);
             send = sendRegister(cpf, fullName, email, password, password);
-            console.log(send);
         });
 
         when("realizo a requisição de cadastro com o full_name invalido", async () => {
@@ -228,8 +225,6 @@ defineFeature(feature, (test) => {
 
             send = sendRegister(cpf, fullName, email, password, password);
 
-            console.log(passwordPlaceholder)
-            console.log(send)
         });
 
         when("realizo a requisição de cadastro com senha inválida", async () => {
@@ -261,7 +256,6 @@ defineFeature(feature, (test) => {
 
             send = sendRegister(cpf, fullName, email, password, passwordConfirm);
 
-            console.log(send)
         });
 
         when("realizo a requisição de cadastro com confirmação de senha inválida", async () => {
