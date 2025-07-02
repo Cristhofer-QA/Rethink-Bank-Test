@@ -10,7 +10,7 @@ Feature: Login
     Given que tenho um usuário cadastrado e com email não confirmado
     When realizo a requisição de login, informando as credenciais do usuário não validado
     Then a resposta não deve conter um token
-    # And a resposta de conter uma mensagem de conta não validada
+    And a resposta de conter uma mensagem de conta não validada
     And o status da resposta deve ser 400
 
   Scenario Outline: Login com campos incorretos - <scenario>

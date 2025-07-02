@@ -16,6 +16,7 @@ defineFeature(feature, (test) => {
     let userData;
 
     const credentialsInvalidMessage = 'Credenciais inválidas';
+    const emailNotConfirmed = 'E-mail não confirmado';
 
     beforeEach(async () => {
         userData = userGenerator.generateUserValid();
@@ -85,13 +86,16 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).toHaveProperty('token');
-            expect(response.body.token).not.toBeNull();
-            expect(response.body.token).toBeDefined();
+            expect(response.body).not.toHaveProperty('token');
+        });
+
+        and("a resposta de conter uma mensagem de conta não validada", () => {
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe(emailNotConfirmed);
         });
 
         and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(200);
+            expect(response.status).toBe(400);
         });
 
     });
