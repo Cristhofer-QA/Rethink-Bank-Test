@@ -19,12 +19,14 @@ npm run run-all
 ---
 ## Anotações
 
-1. Ao tentar cadastrar um usuário com um CPF já cadastrado, está retornando o status code 400,
-porém o erro retornado é estranho. Como se não fosse tratado. O mesmo acontece com o cadastro de e-mail já existente. Segue o erro retornado (cpf duplicado):
+1. Ao tentar cadastrar um usuário com um CPF já cadastrado, está retornando o status code 400, porém o erro retornado é estranho. Como se não fosse tratado. O mesmo acontece com o cadastro de e-mail já existente. Segue o erro retornado (cpf duplicado):
 
 ```bash
     {"error": "duplicate key value violates unique constraint \"users_cpf_key\""}
 ```
+
+2. A documentação não deixa claro se, ao cadastrar um usuário, é obrigatória a confirmação de e-mail para prosseguir no login, ou esse endpoint (/confirm-email) é usando apenas para verificação.
+   Não foi possível realizar o login sem essa validação. Para a suíte de teste, vou considerá-lo como correto.
 
 
 ## Erros encontrados

@@ -24,4 +24,7 @@ module.exports = {
     passwordConfirmDifferent: '${PASSWORD_CONFIRM_DIFERENTE}',
     passwordConfirmInvalid: '${PASSWORD_CONFIRM_INVALIDA}',
 
+    sendEmailIncorrect: 'EMAIL',
+    sendPasswordIncorrect: 'SENHA',
+
 };
