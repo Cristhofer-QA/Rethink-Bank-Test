@@ -38,11 +38,25 @@ async function generalBalance(bearerToken = null) {
     return response;
 };
 
+async function sendPoints(send, bearerToken = null) {
+    const client = createClient(bearerToken);
+    const response = await client[endpoints.send_point.method](endpoints.send_point.path).send(send);
+    return response;
+}
+
+async function extractPoints(bearerToken = null) {
+    const client = createClient(bearerToken);
+    const response = await client[endpoints.extract_point.method](endpoints.extract_point.path);
+    return response;
+}
+
 
 module.exports = {
     login,
     account,
+    sendPoints,
     confirmEmail,
     registerUser,
+    extractPoints,
     generalBalance,
 };

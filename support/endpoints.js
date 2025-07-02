@@ -29,9 +29,20 @@ module.exports = {
         method: 'get',
         path: '/confirm-email'
     },
-
     general_balance: {
         method: 'get',
         path: '/points/saldo'
     },
+    send_point: {
+        method: 'post',
+        path: '/points/send',
+        send: (cpfRecipient, amountSend) => ({
+            recipientCpf: cpfRecipient,
+            amount: amountSend
+        })
+    },
+    extract_point: {
+        method: 'get',
+        path: '/points/extrato'
+    }
 };

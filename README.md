@@ -41,3 +41,6 @@ npm run run-all
 2. Endpoint POST /login
    Está permitindo usuário deletado (/account) logar no sistema.
    (Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se p /account não está deletando os usuários). 
+
+3. Endpoint POST /points/send
+   Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.

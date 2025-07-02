@@ -51,8 +51,6 @@ defineFeature(feature, (test) => {
 
     });
 
-
-
     test("Cadastro de usuário corretamente e verificação dos 100 pontos iniciais", ({ given, when, then, and }) => {
         let send, response, bearerToken, token;
         const cpf = generator.generateCpf(featureVar.cpfValid);
@@ -85,11 +83,7 @@ defineFeature(feature, (test) => {
 
         when("consulto o saldo geral dele", async () => {
             response = await utils.generalBalance(bearerToken);
-            console.log(response.status)
-            console.log(response.body)
         });
-
-
 
 
         then("a consulta deve retornar 100 pontos como resultado", () => {
