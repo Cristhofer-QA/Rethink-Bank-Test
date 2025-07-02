@@ -7,8 +7,6 @@ const { send: sendRegister } = endpoints.register;
 const { send: sendLogin } = endpoints.login;
 const { send: sendAccount } = endpoints.account;
 const userGenerator = require('../../generators/userGenerator');
-const featuresVariables = require("../../variables/featuresVariables");
-
 
 defineFeature(feature, (test) => {
 
@@ -191,10 +189,7 @@ defineFeature(feature, (test) => {
 
         and("realizo a requisição de exclusão de conta, informando uma senha nula", async () => {
             send = sendAccount(null);
-            console.log(send)
             response = await utils.account(send, bearerToken);
-            console.log(response.body)
-            console.log(response.status)
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
@@ -298,8 +293,6 @@ defineFeature(feature, (test) => {
         and("realizo a requisição de exclusão de conta, com dados corretos, mas sem bearer token", async () => {
             send = sendAccount(userData.password);
             response = await utils.account(send, null);
-            console.log(response.body)
-            console.log(response.status)
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {

@@ -284,13 +284,8 @@ defineFeature(feature, (test) => {
 
             send = sendLogin(emailSend, passwordSend);
 
-            console.log("send");
-            console.log(send);
 
             response = await utils.login(send);
-            console.log("response");
-            console.log(response.body);
-            console.log(response.status);
 
         });
 
