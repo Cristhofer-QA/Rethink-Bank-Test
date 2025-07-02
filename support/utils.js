@@ -7,8 +7,8 @@ const { method: methodRegister, path: pathRegister, send: sendRegister } = endpo
 const { method: methodConfirmEmail, path: pathConfirmEmail } = endpoints.confirm_email;
 
 
-async function account(send, token = null) {
-    const client = createClient(token);
+async function account(send, bearerToken = null, token = null) {
+    const client = createClient(bearerToken, token);
     const response = await client[methodAccount](pathAccount).send(send);
     return response;
 };
@@ -26,7 +26,7 @@ async function registerUser(send) {
 }
 
 async function confirmEmail(token) {
-    const client = createClient(token);
+    const client = createClient(null, token);
     const response = await client[methodConfirmEmail](pathConfirmEmail);
     return response;
 }

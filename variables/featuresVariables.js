@@ -26,5 +26,6 @@ module.exports = {
 
     sendEmailIncorrect: 'EMAIL',
     sendPasswordIncorrect: 'SENHA',
+    sendAllFieldsIncorrect: 'ALL',
 
 };
