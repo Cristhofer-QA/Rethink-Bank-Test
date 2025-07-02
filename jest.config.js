@@ -1,5 +1,5 @@
 module.exports = {
-  testMatch: ["**/tests/steps/**/*Email.steps.js"],
+  testMatch: ["**/tests/steps/**/*.steps.js"],
   testEnvironment: 'node',
   setupFiles: ['dotenv/config'],
   reporters: [
