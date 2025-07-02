@@ -6,7 +6,7 @@
   "scripts": {
     "setup": "npm install",
     "test": "jest",
-    "run-all": "npm run setup && npm test && npm run report"
+    "run-all": "npm run setup && npm test"
   },
   "keywords": [],
   "author": "Cristhofer Mian",

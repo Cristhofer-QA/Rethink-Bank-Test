@@ -20,7 +20,7 @@ jobs:
         run: npm ci
 
       - name: Executar testes
-        run: npm test
+        run: npm run run-all
 
       - name: Exportar relatório de testes
         if: always()
