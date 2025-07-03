@@ -1,7 +1,8 @@
 # Rethink-Bank-Test
 Repositório criado para realização de testes de API utilizando Jest, Cucumber e Supertest.
 
----
+<br>
+<br>
 <br>
 
 # Como rodar o projeto
@@ -12,8 +13,8 @@ Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
 npm  run  run-all
 ```
 <br>
-
----
+<br>
+<br>
 
 
 # RESPONDENDO AS PERGUNTAS
@@ -98,8 +99,7 @@ npm  run  run-all
 ## Diante do cenário, o sistema está pronto para subir em produção?
 Resposta: Não! Acredito que o sistema tenha muitas falhas, tanto de segurança, quanto das funcionalidades principais.
 
----
-
+<br>
 <br>
 <br>
 
