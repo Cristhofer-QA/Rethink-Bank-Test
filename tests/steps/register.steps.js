@@ -8,7 +8,7 @@ const userGenerator = require('../../generators/userGenerator');
 const methodsSupports = require('../../support/methodsSupports');
 const registerStatus = require('../../checker/status/registerStatusCheck');
 const registerFields = require('../../checker/fields/registerFieldsCheck');
-const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
+const generalBalanceFields = require('../../checker/fields/generalBalanceFieldsCheck');
 const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
 const { send: sendRegister } = endpoints.register;
 

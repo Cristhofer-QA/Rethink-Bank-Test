@@ -9,7 +9,7 @@ const pointsStatus = require('../../checker/status/sendPointsStatusCheck');
 const methodsSupports = require('../../support/methodsSupports');
 const extractPointsStatus = require('../../checker/status/extractPointsStatusCheck');
 const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
-const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
+const generalBalanceFields = require('../../checker/fields/generalBalanceFieldsCheck');
 const { send: sendSendPoints } = endpoints.send_point;
 
 

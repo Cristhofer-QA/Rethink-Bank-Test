@@ -8,7 +8,7 @@ const confirmEmailStatus = require('../../checker/status/confirmEmailStatusCheck
 
 
 defineFeature(feature, (test) => {
-    let userCreated, confirmToken;
+    let userCreated, confirmToken, response;
 
     beforeEach(async () => {
         const user = await methodsSupports.registerUser();
@@ -18,15 +18,15 @@ defineFeature(feature, (test) => {
 
     test("Confirmação correta de e-mail", ({ given, when, then, and }) => {
         given('que tenho um usuário cadastrado que não possua e-mail confirmado', async () => {
-            methodsSupports.verifyUserCreated();
+            methodsSupports.verifyUserCreated(userCreated);
         });
 
         when('realizo a requisição de confirmar e-mail para o usuário que não foi confirmado', async () => {
-            response = await utils.confirmEmail(token);
+            response = await utils.confirmEmail(confirmToken);
         });
 
         then('o status da resposta deve ser 200 (para a confirmação do e-mail ainda não confirmado)', () => {
-            confirmEmailStatus.confirmEmailSuccess(response);
+            confirmEmailStatus.verifyConfirmEmailSuccess(response);
         });
 
         and('a resposta deve apresentar a mensagem de confirmação (do e-mail ainda não confirmado)', () => {
@@ -38,16 +38,16 @@ defineFeature(feature, (test) => {
         let response;
 
         given('que tenha um usuário cadastrado com um e-mail já confirmado', async () => {
-            supportMethods.verifyUserCreated(userCreated);
-            await supportMethods.confirmEmail(confirmToken);
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(confirmToken);
         });
 
         when('realizo a requisição de confirmar e-mail para o usuário que já foi confirmado', async () => {
-            response = await utils.confirmEmail(token);
+            response = await utils.confirmEmail(confirmToken);
         });
 
         then('o status da responta deve ser 200 (para a confirmação já realizada)', () => {
-            confirmEmailStatus.confirmEmailSuccess(response);
+            confirmEmailStatus.verifyConfirmEmailSuccess(response);
         });
 
         and('a resposta deve apresentar a mensagem de confirmação (para a confirmação já realizada)', () => {
@@ -58,12 +58,12 @@ defineFeature(feature, (test) => {
     test("Confirmar um e-mail com um token inválido", ({ given, when, then, and }) => {
         let response;
         given('que tenha um usuário cadastrado e com o token retornado', async () => {
-            supportMethods.verifyUserCreated(userCreated);
+            methodsSupports.verifyUserCreated(userCreated);
             confirmToken = confirmToken + 'err';
         });
 
         when('realizo a requisição de confirmar e-mail informando um token incorreto', async () => {
-            response = await utils.confirmEmail(token);
+            response = await utils.confirmEmail(confirmToken);
         });
 
         then('o status da responta deve ser 400 (para a confirmação com token incorreto)', () => {
@@ -79,7 +79,7 @@ defineFeature(feature, (test) => {
         let response;
 
         given('que tenha um usuário cadastrado e com o token retornado (validação sem token)', async () => {
-            supportMethods.verifyUserCreated(userCreated);
+            methodsSupports.verifyUserCreated(userCreated);
         });
 
         when('realizo a requisição de confirmar e-mail não informando um token', async () => {
