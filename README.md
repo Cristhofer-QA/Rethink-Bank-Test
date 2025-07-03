@@ -1,11 +1,11 @@
-# Rethink-Bank-Test
+# RETHINK BANK TEST
 Repositório criado para realização de testes de API utilizando Jest, Cucumber e Supertest.
 
 <br>
 <br>
 <br>
 
-## Como rodar o projeto
+## COMO RODAR O PROJETO
 
 Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
 
@@ -19,7 +19,7 @@ Para isso, basta executar o Workflow "API Tests CI".
 <br>
 <br>
 
-## Relatórios de execução
+## RELATÓRIOS DE EXECUÇÃO
 
 A execução dos testes — tanto manual quanto via CI — gera um relatório automaticamente:
 - Execução manual: o relatório estará disponível na pasta reports, localizada na raiz do projeto.
@@ -115,7 +115,7 @@ Resposta: Não! Acredito que o sistema tenha muitas falhas, tanto de segurança,
 <br>
 <br>
 
-## Anotações
+## ANOTAÇÕES
 
 1. Ao tentar cadastrar um usuário com um CPF já cadastrado, está retornando o status code 400, porém o erro retornado é estranho. Como se não fosse tratado. O mesmo acontece com o cadastro de e-mail já existente. Segue o erro retornado (cpf duplicado):
 ```bash
