@@ -29,6 +29,7 @@ npm  run  run-all
 1. Está permitindo usuário deletado (/account) logar no sistema.(Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se o /account não está deletando os usuários).
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
+
 ### Endpoint POST /points/send
 1. Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
 - *O esperado é que, se a solicitação for concluída, adicionar o valor transferido à conta do usuário que o recebeu.*
