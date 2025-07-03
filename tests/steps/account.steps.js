@@ -1,41 +1,29 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Account.feature"));
 const utils = require('../../support/utils');
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Account.feature"));
 const endpoints = require('../../support/endpoints');
+const userGenerator = require('../../generators/userGenerator');
+const supportMethods = require('../../support/methodsSupport');
+const accountMessage = require('../../messages/account');
 const { send: sendRegister } = endpoints.register;
 const { send: sendLogin } = endpoints.login;
 const { send: sendAccount } = endpoints.account;
-const userGenerator = require('../../generators/userGenerator');
 
 defineFeature(feature, (test) => {
-
-    let userCreated = null;
-    let confirmToken = null;
-    let userData;
-
     const accountSuccessMessage = 'Conta marcada como deletada.';
     const invalidPasswordMessage = 'Senha inválida';
     const unauthorizedMessage = 'Não autorizado';
 
+    let userCreated;
+    let confirmToken;
+    let userData;
+
     beforeEach(async () => {
-        userData = userGenerator.generateUserValid();
-        const sent = sendRegister(
-            userData.cpf,
-            userData.fullName,
-            userData.email,
-            userData.password,
-            userData.confirmPassword
-        )
-
-        try {
-            const res = await utils.registerUser(sent);
-            userCreated = res.status === 201;
-
-            confirmToken = res.body.confirmToken;
-        } catch {
-            userCreated = false;
-        }
+        const user = supportMethods.registerUser();
+        userCreated = user.userCreated;
+        confirmToken = user.confirmToken;
+        userData = user.userData;
     });
 
 
@@ -43,25 +31,12 @@ defineFeature(feature, (test) => {
         let send, response, bearerToken;
 
         given("que tenha um usuário cadastrado com um e-mail já confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
+            supportMethods.verifyUserCreated(userCreated);
+            supportMethods.confirmEmail(confirmToken);
         });
 
         when("logo no sistema com esse usuário", async () => {
-            send = sendLogin(userData.email, userData.password);
-            response = await utils.login(send);
-            if (response.status !== 200) {
-                throw new Error('Login não efetuado. Cenário ignorado.');
-            };
-
-            bearerToken = response.body.token;
+            bearerToken = supportMethods.loginUser(userData.email, userData.password);
         });
 
         and("realizo a requisição de exclusão de conta, informando a senha correta para esse usuário", async () => {
@@ -84,25 +59,12 @@ defineFeature(feature, (test) => {
         let send, response, bearerToken;
 
         given("que tenha um usuário cadastrado com um e-mail já confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
+            supportMethods.verifyUserCreated(userCreated);
+            supportMethods.confirmEmail(confirmToken);
         });
 
         when("logo no sistema com esse usuário", async () => {
-            send = sendLogin(userData.email, userData.password);
-            response = await utils.login(send);
-            if (response.status !== 200) {
-                throw new Error('Login não efetuado. Cenário ignorado.');
-            };
-
-            bearerToken = response.body.token;
+            bearerToken = supportMethods.loginUser(userData.email, userData.password);
         });
 
         and("realizo a requisição de exclusão de conta, informando uma senha incorreta para esse usuário", async () => {
@@ -125,25 +87,12 @@ defineFeature(feature, (test) => {
         let send, response, bearerToken;
 
         given("que tenha um usuário cadastrado com um e-mail já confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
+            supportMethods.verifyUserCreated(userCreated);
+            supportMethods.confirmEmail(confirmToken);
         });
 
         when("logo no sistema com esse usuário", async () => {
-            send = sendLogin(userData.email, userData.password);
-            response = await utils.login(send);
-            if (response.status !== 200) {
-                throw new Error('Login não efetuado. Cenário ignorado.');
-            };
-
-            bearerToken = response.body.token;
+            bearerToken = supportMethods.loginUser(userData.email, userData.password);
         });
 
         and("realizo a requisição de exclusão de conta, informando uma senha vazia", async () => {
@@ -166,25 +115,12 @@ defineFeature(feature, (test) => {
         let send, response, bearerToken;
 
         given("que tenha um usuário cadastrado com um e-mail já confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
+            supportMethods.verifyUserCreated(userCreated);
+            supportMethods.confirmEmail(confirmToken);
         });
 
         when("logo no sistema com esse usuário", async () => {
-            send = sendLogin(userData.email, userData.password);
-            response = await utils.login(send);
-            if (response.status !== 200) {
-                throw new Error('Login não efetuado. Cenário ignorado.');
-            };
-
-            bearerToken = response.body.token;
+            bearerToken = supportMethods.loginUser(userData.email, userData.password);
         });
 
         and("realizo a requisição de exclusão de conta, informando uma senha nula", async () => {
