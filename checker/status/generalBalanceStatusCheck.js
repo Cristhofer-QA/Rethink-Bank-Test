@@ -4,7 +4,7 @@ function checkGeneralBalanceSuccess(response) {
     expect(response.status).toBe(successGeneralBalance);
 }
 
-module.exports = {
-    successGeneralBalance,
-    checkGeneralBalanceSuccess
+module.exports = { 
+    checkGeneralBalanceSuccess,
+    successGeneralBalance
 };

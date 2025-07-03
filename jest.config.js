@@ -1,5 +1,5 @@
 module.exports = {
-  testMatch: ["**/tests/steps/**/*points.steps.js"],
+  testMatch: ["**/tests/steps/**/*Draw.steps.js"],
   testEnvironment: 'node',
   setupFiles: ['dotenv/config'],
   reporters: [

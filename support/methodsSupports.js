@@ -5,6 +5,7 @@ const confirmEmailStatus = require('../checker/status/confirmEmailStatusCheck').
 const loginStatusSuccess = require('../checker/status/loginStatusCheck').loginSuccess;
 const accountStatusSuccess = require('../checker/status/accountStatusCheck').accountSuccess;
 const generalBalanceStatus = require('../checker/status/generalBalanceStatusCheck').successGeneralBalance;
+const piggyBankExtractStatus = require('../checker/status/piggyBankExtractStatusCheck').piggyBankExtractSuccess;
 const { send: sendLogin } = endpoints.login;
 const { send: sendAccount } = endpoints.account;
 const { send: sendRegister } = endpoints.register;
@@ -51,7 +52,15 @@ async function accountUser(password, bearerToken) {
 async function generalBalance(bearerToken = null) {
     const response = await utils.generalBalance(bearerToken);
     if (response.status !== generalBalanceStatus) {
-        throw new Error('Usuário não foi deletado, cenário ignorado');
+        throw new Error('Consulta não foi realizada, cenário ignorado');
+    };
+    return response;
+};
+
+async function piggyBankExtract(bearerToken = null) {
+    const response = await utils.pointsPiggyBankExtract(bearerToken);
+    if (response.status !== piggyBankExtractStatus) {
+        throw new Error('Consulta não foi realizada, cenário ignorado');
     };
     return response;
 };
@@ -68,5 +77,6 @@ module.exports = {
     confirmEmail,
     registerUser,
     generalBalance,
+    piggyBankExtract,
     verifyUserCreated,
 };
