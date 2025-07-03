@@ -96,7 +96,7 @@ npm  run  run-all
 <br>
 <br>
 
-## Diante do cenário, o sistema está pronto para subir em produção?
+## 3 - Diante do cenário, o sistema está pronto para subir em produção?
 Resposta: Não! Acredito que o sistema tenha muitas falhas, tanto de segurança, quanto das funcionalidades principais.
 
 <br>
