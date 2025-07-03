@@ -24,6 +24,7 @@ npm  run  run-all
 1. Cadastra o usuário quando a senha não possui números (que é pré-requisito).
 - *Nesse caso, não deve permitir o cadastro, visto que o número na senha é obrigatório.*
 <br>
+
 ### Endpoint POST /login
 1. Está permitindo usuário deletado (/account) logar no sistema.(Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se o /account não está deletando os usuários).
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
