@@ -1,32 +1,25 @@
-const userGenerator = require('../generators/userGenerator');
-const endpoints = require('../support/endpoints');
 const utils = require('../support/utils');
-const { send: sendRegister } = endpoints.register;
+const endpoints = require('../support/endpoints');
+const userGenerator = require('../generators/userGenerator');
+const loginStatusSuccess = require('../checker/status/loginStatusCheck').loginSuccess;
+const accountStatusSuccess = require('../checker/status/accountStatusCheck').accountSuccess;
+const confirmEmailStatusCheck = require('../checker/status/confirmEmailStatusCheck').confirmEmailSuccess;
 const { send: sendLogin } = endpoints.login;
+const { send: sendAccount } = endpoints.account;
+const { send: sendRegister } = endpoints.register;
 
 async function confirmEmail(token) {
-
     const res = await utils.confirmEmail(token);
-
-    if (res.status !== 200) {
+    if (res.status !== confirmEmailStatusCheck) {
         throw new Error('Email não foi validado, cenário ignorado');
     };
-
-
 };
 
 async function registerUser() {
     let confirmToken;
     let userCreated = true;
     const userData = userGenerator.generateUserValid();
-    const sent = sendRegister(
-        userData.cpf,
-        userData.fullName,
-        userData.email,
-        userData.password,
-        userData.confirmPassword
-    );
-
+    const sent = sendRegister(userData.cpf, userData.fullName, userData.email, userData.password, userData.confirmPassword);
     try {
         const response = await utils.registerUser(sent);
         confirmToken = response.body.confirmToken;
@@ -38,16 +31,21 @@ async function registerUser() {
 
 async function loginUser(email, password) {
     const sent = sendLogin(email, password);
-
     const res = await utils.login(sent);
-
-    if (res.status !== 200) {
+    if (res.status !== loginStatusSuccess) {
         throw new Error('Usuário não foi logado, cenário ignorado');
     };
-
     return res.body.token;
 };
 
+async function accountUser(password, bearerToken) {
+    const send = sendAccount(password);
+    const response = await utils.account(send, bearerToken);
+    if (response.status !== accountStatusSuccess) {
+        throw new Error('Usuário não foi deletado, cenário ignorado');
+    };
+    return response;
+};
 
 
 
@@ -61,8 +59,9 @@ function verifyUserCreated(userCreated) {
 
 
 module.exports = {
-    confirmEmail,
-    verifyUserCreated,
-    registerUser,
     loginUser,
+    accountUser,
+    confirmEmail,
+    registerUser,
+    verifyUserCreated,
 };

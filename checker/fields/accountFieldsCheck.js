@@ -8,17 +8,17 @@ function verifyErrorAccount(body, message) {
     expect(body.error).toBe(message);
 };
 
-function verifyInvalidPasswordMessage(body) {
-    verifyErrorAccount(body, invalidPasswordMessage);
+function verifyInvalidPasswordMessage(response) {
+    verifyErrorAccount(response.body, invalidPasswordMessage);
 }
 
-function verifyUnauthorizedMessage(body) {
-    verifyErrorAccount(body, unauthorizedMessage);
+function verifyUnauthorizedMessage(response) {
+    verifyErrorAccount(response.body, unauthorizedMessage);
 };
 
-function verifyAccountSuccessMessage(body) {
-    expect(body).toHaveProperty("message");
-    expect(body.message).toBe(accountSuccessMessage);
+function verifyAccountSuccessMessage(response) {
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toBe(accountSuccessMessage);
 };
 
 

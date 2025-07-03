@@ -1,41 +1,26 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Login.feature"));
 const utils = require('../../support/utils');
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Login.feature"));
 const endpoints = require('../../support/endpoints');
-const { send: sendRegister } = endpoints.register;
-const { send: sendLogin } = endpoints.login;
-const { send: sendAccount } = endpoints.account;
-const userGenerator = require('../../generators/userGenerator');
+const generator = require('../../generators/baseGenerator');
+const loginFields = require('../../checker/fields/loginFieldsCheck');
+const loginStatus = require('../../checker/status/loginStatusCheck');
+const methodsSupports = require('../../support/methodsSupports');
 const featuresVariables = require("../../variables/featuresVariables");
+const { send: sendLogin } = endpoints.login;
 
 
 defineFeature(feature, (test) => {
-    let userCreated = null;
-    let confirmToken = null;
     let userData;
-
-    const credentialsInvalidMessage = 'Credenciais inválidas';
-    const emailNotConfirmed = 'E-mail não confirmado';
+    let userCreated;
+    let confirmToken;
 
     beforeEach(async () => {
-        userData = userGenerator.generateUserValid();
-        const sent = sendRegister(
-            userData.cpf,
-            userData.fullName,
-            userData.email,
-            userData.password,
-            userData.confirmPassword
-        )
-
-        try {
-            const res = await utils.registerUser(sent);
-            userCreated = res.status === 201;
-
-            confirmToken = res.body.confirmToken;
-        } catch {
-            userCreated = false;
-        }
+        const user = await methodsSupports.registerUser();
+        userCreated = user.userCreated;
+        confirmToken = user.confirmToken;
+        userData = user.userData;
     });
 
 
@@ -43,15 +28,8 @@ defineFeature(feature, (test) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
+            methodsSupports.verifyUserCreated(userCreated);
+            await utils.confirmEmail(confirmToken);
         });
 
         when("realizo a requisição de login, informando as credenciais do usuário validado", async () => {
@@ -60,24 +38,19 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter um token", () => {
-            expect(response.body).toHaveProperty('token');
-            expect(response.body.token).not.toBeNull();
-            expect(response.body.token).toBeDefined();
+            loginFields.fieldsLoginSuccessCheck(response);
         });
 
         and("o status da resposta deve ser 200", () => {
-            expect(response.status).toBe(200);
+            loginStatus.loginSuccessStatusCheck(response);
         });
-
     });
 
     test("Login com usuário cadastrado e não validado", ({ given, when, then, and }) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email não confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
+            methodsSupports.verifyUserCreated(userCreated);
         });
 
         when("realizo a requisição de login, informando as credenciais do usuário não validado", async () => {
@@ -86,18 +59,16 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("a resposta de conter uma mensagem de conta não validada", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(emailNotConfirmed);
+            loginFields.verifyLoginEmailNotConfirmed(response);
         });
 
         and("o status da resposta deve ser 403", () => {
-            expect(response.status).toBe(403);
+            loginStatus.loginEmailNotConfirmed(response);
         });
-
     });
 
 
@@ -105,16 +76,8 @@ defineFeature(feature, (test) => {
         let send, response;
 
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
-
+            methodsSupports.verifyUserCreated(userCreated);
+            await utils.confirmEmail(confirmToken);
         });
 
         when(/^realizo a requisição de login, informando o campo "([^"]*)" incorreto$/, async (fieldIncorrect) => {
@@ -135,33 +98,23 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("a resposta deve conter uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(credentialsInvalidMessage);
+            loginFields.verifyLoginCredentialsInvalid(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(400);
+            loginStatus.loginCredentialsInvalid(response);
         });
-
     });
 
     test("Login com campos inválidos - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
-
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(confirmToken);
         });
 
         when(/^realizo a requisição de login, informando o campo "([^"]*)" inválido$/, async (fieldIncorrect) => {
@@ -169,11 +122,11 @@ defineFeature(feature, (test) => {
             let passwordSend = userData.password;
 
             if (fieldIncorrect === featuresVariables.sendEmailIncorrect) {
-                emailSend = userData.email.replace('@'), "";
+                emailSend = generator.generateEmail(featuresVariables.emailInvalid);
             };
 
             if (fieldIncorrect === featuresVariables.sendPasswordIncorrect) {
-                passwordSend = userData.password.slice(5);
+                passwordSend = generator.generatePassword(featuresVariables.passwordMinusDigit);
             };
 
             send = sendLogin(emailSend, passwordSend);
@@ -181,34 +134,24 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("a resposta deve conter uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(credentialsInvalidMessage);
+            loginFields.verifyLoginCredentialsInvalid(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(400);
+            loginStatus.loginCredentialsInvalid(response);
         });
-
     });
 
 
     test("Login com campos nulos - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
-
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(confirmToken);
         });
 
         when(/^realizo a requisição de login, informando o campo "([^"]*)" null$/, async (fieldIncorrect) => {
@@ -227,42 +170,30 @@ defineFeature(feature, (test) => {
                 emailSend = null;
                 passwordSend = null;
             };
-
+            
             send = sendLogin(emailSend, passwordSend);
-
-
             response = await utils.login(send);
 
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("a resposta deve conter uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(credentialsInvalidMessage);
+            loginFields.verifyLoginCredentialsInvalid(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(400);
+            loginStatus.loginCredentialsInvalid(response);
         });
-
     });
 
     test("Login com campos vazios - <scenario>", ({ given, when, then, and }) => {
         let send, response;
         given("que tenho um usuário cadastrado e com email confirmado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
-
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(confirmToken);
         });
 
         when(/^realizo a requisição de login, informando o campo "([^"]*)" vazio$/, async (fieldIncorrect) => {
@@ -283,60 +214,31 @@ defineFeature(feature, (test) => {
             };
 
             send = sendLogin(emailSend, passwordSend);
-
-
             response = await utils.login(send);
-
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("a resposta deve conter uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(credentialsInvalidMessage);
+            loginFields.verifyLoginCredentialsInvalid(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(400);
+            loginStatus.loginCredentialsInvalid(response);
         });
-
     });
 
     test("Login correto mas para usuário deletado", ({ given, when, then, and }) => {
-        let send, response, tokenLogin;
+        let send, response, bearerToken;
 
         // Nesse passo, vou confirmar o e-mail do usuário criado e excluir a conta desse usuário
         given("que tenho um usuário cadastrado, com email confirmado, mas deletado", async () => {
-            if (!userCreated) {
-                throw new Error('Usuário não foi criado, cenário ignorado');
-            };
-
-            const res = await utils.confirmEmail(confirmToken);
-
-            if (res.status !== 200) {
-                throw new Error('Email não foi validado, cenário ignorado');
-            };
-
-            let emailSend = userData.email;
-            let passwordSend = userData.password;
-            send = sendLogin(emailSend, passwordSend);
-
-            const resLoginValido = await utils.login(send);
-
-            if (resLoginValido.status !== 200) {
-                throw new Error('Primeiro login não realizado (para pegar o token), cenário ignorado');
-            };
-
-            tokenLogin = resLoginValido.body.token;
-
-            const bodySendAccount = sendAccount(passwordSend);
-
-            const resAccount = await utils.account(bodySendAccount, tokenLogin, null);
-            if (resAccount.status !== 200) {
-                throw new Error('Conta não foi excluída, cenário ignorado');
-            };
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(confirmToken);
+            bearerToken = await methodsSupports.loginUser(userData.email, userData.password);
+            await methodsSupports.accountUser(userData.password, bearerToken);
         });
 
         when("realizo a requisição de login, informando as informações desse usuário", async () => {
@@ -344,14 +246,11 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta não deve conter um token", () => {
-            expect(response.body).not.toHaveProperty('token');
+            loginFields.verifyNotToken(response);
         });
 
         and("o status da resposta não deve ser 200", () => {
-            expect(response.status).not.toBe(400);
+            loginStatus.loginCredentialsInvalid(response);
         });
-
     }, 20000);
-
-
 });

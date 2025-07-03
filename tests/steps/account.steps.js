@@ -3,9 +3,9 @@ const path = require("path");
 const utils = require('../../support/utils');
 const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Account.feature"));
 const endpoints = require('../../support/endpoints');
-const supportMethods = require('../../support/methodsSupports');
-const accountMessage = require('../../checker/messages/accountMessagesCheck');
+const accountFields = require('../../checker/fields/accountFieldsCheck');
 const accountStatus = require('../../checker/status/accountStatusCheck');
+const supportMethods = require('../../support/methodsSupports');
 const { send: sendAccount } = endpoints.account;
 
 defineFeature(feature, (test) => {
@@ -19,7 +19,6 @@ defineFeature(feature, (test) => {
         userCreated = user.userCreated;
         confirmToken = user.confirmToken;
         userData = user.userData;
-
     });
 
     test("Exclusão correta de conta", ({ given, when, then, and }) => {
@@ -36,18 +35,16 @@ defineFeature(feature, (test) => {
 
         and("realizo a requisição de exclusão de conta, informando a senha correta para esse usuário", async () => {
             send = sendAccount(userData.password);
-
             response = await utils.account(send, bearerToken);
         });
 
         then("a resposta deve conter uma mensagem de sucesso", () => {
-            accountMessage.verifyAccountSuccessMessage(response.body);
+            accountFields.verifyAccountSuccessMessage(response);
         });
 
         and("o status da resposta deve ser 200", () => {
-            accountStatus.verifyStatusSuccess(response.status);
+            accountStatus.verifyStatusSuccess(response);
         });
-
     });
 
     test("Exclusão de conta informando senha inválida", ({ given, when, then, and }) => {
@@ -68,13 +65,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
-            accountMessage.verifyInvalidPasswordMessage(response.body);
+            accountFields.verifyInvalidPasswordMessage(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            accountStatus.verifyStatusPasswordInvalid(response.status);
+            accountStatus.verifyStatusPasswordInvalid(response);
         });
-
     });
 
     test("Exclusão de conta não informando senha", ({ given, when, then, and }) => {
@@ -95,13 +91,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
-            accountMessage.verifyInvalidPasswordMessage(response.body);
+            accountFields.verifyInvalidPasswordMessage(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            accountStatus.verifyStatusPasswordInvalid(response.status);
+            accountStatus.verifyStatusPasswordInvalid(response);
         });
-
     });
 
     test("Exclusão de conta informando senha nula", ({ given, when, then, and }) => {
@@ -122,11 +117,11 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
-            accountMessage.verifyInvalidPasswordMessage(response.body);
+            accountFields.verifyInvalidPasswordMessage(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            accountStatus.verifyStatusPasswordInvalid(response.status);
+            accountStatus.verifyStatusPasswordInvalid(response);
         });
     });
 
@@ -153,13 +148,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
-            accountMessage.verifyInvalidPasswordMessage(response.body);
+            accountFields.verifyInvalidPasswordMessage(response);
         });
 
         and("o status da resposta deve ser 400", () => {
-            accountStatus.verifyStatusPasswordInvalid(response.status);
+            accountStatus.verifyStatusPasswordInvalid(response);
         });
-
     });
 
     test("Exclusão de conta não informando o bearer token", ({ given, when, then, and }) => {
@@ -180,12 +174,11 @@ defineFeature(feature, (test) => {
         });
 
         then("a resposta deve conter uma mensagem de erro", () => {
-            accountMessage.verifyUnauthorizedMessage(response.body);
+            accountFields.verifyUnauthorizedMessage(response);
         });
 
         and("o status da resposta deve ser 401", () => {
-            accountStatus.verifyStatusUnauthorized(response.status);
+            accountStatus.verifyStatusUnauthorized(response);
         });
-
     });
 });

@@ -1,21 +1,22 @@
 const passwordInvalid = 400;
 const unauthorized = 401;
-const success = 200;
+const accountSuccess = 200;
 
-function verifyStatusPasswordInvalid(status) {
-    expect(status).toBe(passwordInvalid);
+function verifyStatusPasswordInvalid(response) {
+    expect(response.status).toBe(passwordInvalid);
 };
 
-function verifyStatusUnauthorized(status) {
-    expect(status).toBe(unauthorized);
+function verifyStatusUnauthorized(response) {
+    expect(response.status).toBe(unauthorized);
 };
 
-function verifyStatusSuccess(status) {
-    expect(status).toBe(success);
+function verifyStatusSuccess(response) {
+    expect(response.status).toBe(accountSuccess);
 };
 
 
 module.exports = {
+    accountSuccess,
     verifyStatusSuccess,
     verifyStatusUnauthorized,
     verifyStatusPasswordInvalid,
