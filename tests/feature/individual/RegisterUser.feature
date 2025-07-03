@@ -3,8 +3,7 @@ Feature: Cadastro de usuário
   Scenario: Cadastro com dados válidos
     Given que possuo todos os dados para o cadastro de usuário
     When realizo a requisição de cadastro com todos os dados válidos
-    Then a resposta deve conter a mensagem de cadastro com sucesso
-    And a resposta deve conter o campo confirmToken
+    Then a resposta deve conter a mensagem de cadastro com sucesso e um confirmToken
     And o status da resposta deve ser 201
 
   Scenario: Cadastro de usuário corretamente e verificação dos 100 pontos iniciais
@@ -17,19 +16,25 @@ Feature: Cadastro de usuário
     Given que eu possua o CPF de um usuário já cadastrado
     When realizo a requisição de cadastro informando o CPF já cadastrado
     Then deve retornar uma responta informando que CPF já está cadastrado
-    And o status da resposta deve ser 400 para o CPF já está cadastrado
+    And o status da resposta deve ser 400
+
+  Scenario: Cadastro com CPF já cadastrado, mas com email não validado
+    Given que eu possua o CPF de um usuário ja cadastrado, mas com email nao validado
+    When realizo a requisição de cadastro informando o CPF ja cadastrado
+    Then deve retornar uma responta informando que CPF ja esta cadastrado
+    And o status da resposta deve ser 400
 
   Scenario: Cadastro com email já cadastrado
     Given que eu possua o email de um usuário já cadastrado
     When realizo a requisição de cadastro informando o email já cadastrado
     Then deve retornar uma responta informando que email já está cadastrado
-    And o status da resposta deve ser 400 para o email já está cadastrado
+    And o status da resposta deve ser 400
 
   Scenario Outline: Cadastro com CPF inválido - <scenario>
     Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com CPF inválido
     When realizo a requisição de cadastro com o CPF inválido
     Then a responta deve conter um erro para o CPF inválido
-    And o status da resposta deve ser 400 para o CPF inválido
+    And o status da resposta deve ser 400
 
     Examples:
       | scenario              | cpf                  | full_name           | email           | password           |
@@ -42,7 +47,7 @@ Feature: Cadastro de usuário
     Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com Full Name inválido
     When realizo a requisição de cadastro com o full_name invalido
     Then a responta deve conter um erro para o full_name invalido
-    And o status da resposta deve ser 400 para o full_name invalido
+    And o status da resposta deve ser 400
 
     Examples:
       | scenario                    | cpf           | full_name        | email           | password           |
@@ -51,9 +56,9 @@ Feature: Cadastro de usuário
 
   Scenario Outline: Cadastro com email invalido - <scenario>
     Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com email inválido
-    When realizo a requisição de cadastro com o full_name invalido
-    Then a responta deve conter um erro para o full_name invalido
-    And o status da resposta deve ser 400 para o full_name invalido
+    When realizo a requisição de cadastro com o email invalido
+    Then a responta deve conter um erro para o email invalido
+    And o status da resposta deve ser 400
 
     Examples:
       | scenario       | cpf           | full_name           | email                | password           |
@@ -65,7 +70,7 @@ Feature: Cadastro de usuário
     Given que possuo os dados "<cpf>", "<full_name>", "<email>" e "<password>" pra cadastro com senha inválida
     When realizo a requisição de cadastro com senha inválida
     Then a responta deve conter um erro com senha inválida
-    And o status da resposta deve ser 400 com senha inválida
+    And o status da resposta deve ser 400
 
     Examples:
       | scenario                     | cpf           | full_name           | email           | password                           |
@@ -80,7 +85,7 @@ Feature: Cadastro de usuário
     Given que possuo os dados "<cpf>", "<full_name>", "<email>", "<password>" e "<password_confirm>" pra cadastro com confirmação de senha inválida
     When realizo a requisição de cadastro com confirmação de senha inválida
     Then a responta deve conter um erro com confirmação de senha inválida
-    And o status da resposta deve ser 400 com confirmação de senha inválida
+    And o status da resposta deve ser 400
 
     Examples:
       | scenario                        | cpf           | full_name           | email           | password           | password_confirm              |

@@ -9,7 +9,6 @@ const supportMethods = require('../../support/methodsSupports');
 const { send: sendAccount } = endpoints.account;
 
 defineFeature(feature, (test) => {
-
     let userCreated;
     let confirmToken;
     let userData;

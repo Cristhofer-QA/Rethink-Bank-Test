@@ -4,184 +4,145 @@ const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Regis
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
-const { send: sendLogin } = endpoints.login;
 const generator = require('../../generators/baseGenerator');
 const featureVar = require('../../variables/featuresVariables')
-
+const userGenerator = require('../../generators/userGenerator');
+const methodsSupports = require('../../support/methodsSupports');
+const registerStatus = require('../../checker/status/registerStatusCheck');
+const registerFields = require('../../checker/fields/registerFieldsCheck');
+const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
+const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
 
 defineFeature(feature, (test) => {
-    const successRegistrationMessage = 'Cadastro realizado com sucesso.';
-    const cpfInvalidMessage = 'CPF inválido';
-    const passwordInvalidMessage = 'Senha fraca';
-    const fullNameInvalidMessage = 'Nome completo obrigatório';
-    const emailInvalidMessage = 'Email inválido';
-    const cpfAlreadyRegisteredMessage = 'duplicate key value violates unique constraint \"users_cpf_key\"';
-    const passwordConfirmInvalidMessage = 'Senhas não conferem';
-    const emailAlreadyRegisteredMessage = 'duplicate key value violates unique constraint \"users_email_key\"';
 
     test("Cadastro com dados válidos", ({ given, when, then, and }) => {
         let send, response;
-        const cpf = generator.generateCpf(featureVar.cpfValid);
-        const fullName = generator.generateName(featureVar.fullNameValid);
-        const email = generator.generateEmail(featureVar.emailValid);
-        const password = generator.generatePassword(featureVar.emailValid);
-        const confirmPassword = password;
+        const user = userGenerator.generateUserValid();
 
         given("que possuo todos os dados para o cadastro de usuário", () => {
-            send = sendRegister(cpf, fullName, email, password, confirmPassword);
+            send = sendRegister(user.cpf, user.fullName, user.email, user.password, user.confirmPassword);
         });
 
         when("realizo a requisição de cadastro com todos os dados válidos", async () => {
             response = await utils.registerUser(send);
         });
 
-        then("a resposta deve conter a mensagem de cadastro com sucesso", () => {
-            expect(response.body).toHaveProperty('message');
-            expect(response.body.message).toBe(successRegistrationMessage);
-        });
-
-        and("a resposta deve conter o campo confirmToken", () => {
-            expect(response.body).toHaveProperty('confirmToken');
-            expect(response.body.confirmToken).not.toBeNull();
+        then("a resposta deve conter a mensagem de cadastro com sucesso e um confirmToken", () => {
+            registerFields.checkRegisterSuccess(response);
         });
 
         and("o status da resposta deve ser 201", () => {
-            expect(response.status).toBe(201);
+            registerStatus.checkRegisterSuccess(response);
         });
 
     });
 
     test("Cadastro de usuário corretamente e verificação dos 100 pontos iniciais", ({ given, when, then, and }) => {
-        let send, response, bearerToken, token;
-        const cpf = generator.generateCpf(featureVar.cpfValid);
-        const fullName = generator.generateName(featureVar.fullNameValid);
-        const email = generator.generateEmail(featureVar.emailValid);
-        const password = generator.generatePassword(featureVar.emailValid);
-        const confirmPassword = password;
+        let response, bearerToken;
 
+        //Aqui, vou cadastrar, validar e-mail e fazer login com o usuário
         given("que possua um usuário cadastrado e confirmado o email", async () => {
-            send = sendRegister(cpf, fullName, email, password, confirmPassword);
-            response = await utils.registerUser(send);
-            if (response.status !== 201) {
-                throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
-            }
-
-            token = response.body.confirmToken;
-
-            const resConfirm = await utils.confirmEmail(token);
-            if (resConfirm.status !== 200) {
-                throw new Error("Não foi possível continuar o cenário, pois a verificação do e-mail falhou.")
-            }
-
-            const bodyLogin = sendLogin(email, password);
-            const resLogin = await utils.login(bodyLogin);
-            if (resLogin.status !== 200) {
-                throw new Error("Não foi possível continuar o cenário, pois o login falhou!.")
-            }
-            bearerToken = resLogin.body.token;
+            const registerUser = await methodsSupports.registerUser();
+            methodsSupports.verifyUserCreated(registerUser.userCreated);
+            await methodsSupports.confirmEmail(registerUser.confirmToken);
+            const user = registerUser.userData;
+            bearerToken = await methodsSupports.loginUser(user.email, user.password);
         });
 
         when("consulto o saldo geral dele", async () => {
             response = await utils.generalBalance(bearerToken);
         });
 
-
         then("a consulta deve retornar 100 pontos como resultado", () => {
-            expect(response.body).toHaveProperty('normal_balance');
-            expect(response.body).toHaveProperty('piggy_bank_balance');
-            expect(response.body.normal_balance).toBe(100);
-            expect(response.body.piggy_bank_balance).toBe(0);
+            generalBalanceFields.verifyValuesPoints(response, 100, 0);
         });
 
         and("o status da consulta deve ser 200", () => {
-            expect(response.status).toBe(200);
+            generalBalanceStatus.checkGeneralBalanceSuccess(response);
         });
 
     });
 
     test("Cadastro com CPF já cadastrado", ({ given, when, then, and }) => {
-        let send, response;
-        const cpf = generator.generateCpf(featureVar.cpfValid);
-        const fullName = generator.generateName(featureVar.fullNameValid);
-        const email = generator.generateEmail(featureVar.emailValid);
-        const password = generator.generatePassword(featureVar.emailValid);
-        const confirmPassword = password;
-
-        const cpfAlreadyRegistered = cpf;
-        const fullNameAlreadyRegistered = generator.generateName(featureVar.fullNameValid);
-        const emailAlreadyRegistered = generator.generateEmail(featureVar.emailValid);
-        const passwordAlreadyRegistered = generator.generatePassword(featureVar.emailValid);
-        const confirmPasswordAlreadyRegistered = passwordAlreadyRegistered;
+        let send, response, cpfCadastrado;
 
         given("que eu possua o CPF de um usuário já cadastrado", async () => {
-            const sendAlreadyRegistered = sendRegister(
-                cpfAlreadyRegistered,
-                fullNameAlreadyRegistered,
-                emailAlreadyRegistered,
-                passwordAlreadyRegistered,
-                confirmPasswordAlreadyRegistered
-            );
-            const res = await utils.registerUser(sendAlreadyRegistered);
-            if (res.status !== 201) {
-                throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
-            }
-            send = sendRegister(cpf, fullName, email, password, confirmPassword);
+            // Nesse bloco, vou criar um novo usuário e confirmar o e-mail 
+            const user = await methodsSupports.registerUser();
+            const userCreated = user.userCreated;
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(user.confirmToken);
+            cpfCadastrado = user.userData.cpf;
         });
 
         when("realizo a requisição de cadastro informando o CPF já cadastrado", async () => {
+            const newUser = userGenerator.generateUserValid();
+            newUser.cpf = cpfCadastrado;
+            send = sendRegister(newUser.cpf, newUser.fullName, newUser.email, newUser.password, newUser.confirmPassword);
             response = await utils.registerUser(send);
         });
 
         then("deve retornar uma responta informando que CPF já está cadastrado", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(cpfAlreadyRegisteredMessage);
+            registerFields.cpfAlreadyRegisteredCheck(response);
         });
 
-        and("o status da resposta deve ser 400 para o CPF já está cadastrado", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
+        });
+    });
+
+    test("Cadastro com CPF já cadastrado, mas com email não validado", ({ given, when, then, and }) => {
+        let send, response, cpfCadastrado;
+
+        given("que eu possua o CPF de um usuário ja cadastrado, mas com email nao validado", async () => {
+            // Nesse bloco, vou criar um novo usuário mas não confirmar o e-mail
+            const user = await methodsSupports.registerUser();
+            const userCreated = user.userCreated;
+            methodsSupports.verifyUserCreated(userCreated);
+            cpfCadastrado = user.userData.cpf;
+        });
+
+        when("realizo a requisição de cadastro informando o CPF ja cadastrado", async () => {
+            const newUser = userGenerator.generateUserValid();
+            newUser.cpf = cpfCadastrado;
+            send = sendRegister(newUser.cpf, newUser.fullName, newUser.email, newUser.password, newUser.confirmPassword);
+            response = await utils.registerUser(send);
+        });
+
+        then("deve retornar uma responta informando que CPF ja esta cadastrado", () => {
+            registerFields.cpfAlreadyRegisteredCheck(response);
+        });
+
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
     test("Cadastro com email já cadastrado", ({ given, when, then, and }) => {
-        let send, response;
-        const cpf = generator.generateCpf(featureVar.cpfValid);
-        const fullName = generator.generateName(featureVar.fullNameValid);
-        const email = generator.generateEmail(featureVar.emailValid);
-        const password = generator.generatePassword(featureVar.emailValid);
-        const confirmPassword = password;
-
-        const cpfAlreadyRegistered = generator.generateCpf(featureVar.cpfValid);
-        const fullNameAlreadyRegistered = generator.generateName(featureVar.fullNameValid);
-        const emailAlreadyRegistered = email;
-        const passwordAlreadyRegistered = generator.generatePassword(featureVar.emailValid);
-        const confirmPasswordAlreadyRegistered = passwordAlreadyRegistered;
+        let send, response, emailCadastrado;
 
         given("que eu possua o email de um usuário já cadastrado", async () => {
-            const sendAlreadyRegistered = sendRegister(
-                cpfAlreadyRegistered,
-                fullNameAlreadyRegistered,
-                emailAlreadyRegistered,
-                passwordAlreadyRegistered,
-                confirmPasswordAlreadyRegistered
-            );
-            const res = await utils.registerUser(sendAlreadyRegistered);
-            if (res.status !== 201) {
-                throw new Error("Não foi possível continuar o cenário, pois o cadastro do usuário falhou!.")
-            }
-            send = sendRegister(cpf, fullName, email, password, confirmPassword);
+            // Nesse bloco, vou criar um novo usuário e confirmar o e-mail 
+            const user = await methodsSupports.registerUser();
+            const userCreated = user.userCreated;
+            methodsSupports.verifyUserCreated(userCreated);
+            await methodsSupports.confirmEmail(user.confirmToken);
+            emailCadastrado = user.userData.email;
         });
 
         when("realizo a requisição de cadastro informando o email já cadastrado", async () => {
+            const newUser = userGenerator.generateUserValid();
+            newUser.email = emailCadastrado;
+            send = sendRegister(newUser.cpf, newUser.fullName, newUser.email, newUser.password, newUser.confirmPassword);
             response = await utils.registerUser(send);
         });
 
         then("deve retornar uma responta informando que email já está cadastrado", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(emailAlreadyRegisteredMessage);
+            registerFields.emailAlreadyRegisteredCheck(response);
         });
 
-        and("o status da resposta deve ser 400 para o email já está cadastrado", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
@@ -193,7 +154,6 @@ defineFeature(feature, (test) => {
             const email = generator.generateEmail(emailPlaceholder);
             const fullName = generator.generateName(fullNamePlaceholder);
             const password = generator.generatePassword(passwordPlaceholder);
-
             send = sendRegister(cpf, fullName, email, password, password);
         });
 
@@ -202,13 +162,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a responta deve conter um erro para o CPF inválido", () => {
-            expect(response.body).not.toHaveProperty('confirmToken');
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(cpfInvalidMessage);
+            registerFields.verifyNotToken(response);
+            registerFields.verifyInvalidCpf;
         });
 
-        and("o status da resposta deve ser 400 para o CPF inválido", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
@@ -227,13 +186,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a responta deve conter um erro para o full_name invalido", () => {
-            expect(response.body).not.toHaveProperty('confirmToken');
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(fullNameInvalidMessage);
+            registerFields.verifyNotToken(response);
+            registerFields.verifyInvalidFullName(response);
         });
 
-        and("o status da resposta deve ser 400 para o full_name invalido", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
@@ -247,18 +205,17 @@ defineFeature(feature, (test) => {
             send = sendRegister(cpf, fullName, email, password, password);
         });
 
-        when("realizo a requisição de cadastro com o full_name invalido", async () => {
+        when("realizo a requisição de cadastro com o email invalido", async () => {
             response = await utils.registerUser(send);
         });
 
-        then("a responta deve conter um erro para o full_name invalido", () => {
-            expect(response.body).not.toHaveProperty('confirmToken');
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(emailInvalidMessage);
+        then("a responta deve conter um erro para o email invalido", () => {
+            registerFields.verifyNotToken(response);
+            registerFields.verifyInvalidEmail(response);
         });
 
-        and("o status da resposta deve ser 400 para o full_name invalido", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
@@ -266,14 +223,10 @@ defineFeature(feature, (test) => {
         let send, response;
         given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com senha inválida$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder) => {
             const cpf = generator.generateCpf(cpfPlaceholder);
-
             const email = generator.generateEmail(emailPlaceholder);
-
             const fullName = generator.generateName(fullNamePlaceholder);
             const password = generator.generatePassword(passwordPlaceholder);
-
             send = sendRegister(cpf, fullName, email, password, password);
-
         });
 
         when("realizo a requisição de cadastro com senha inválida", async () => {
@@ -281,13 +234,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a responta deve conter um erro com senha inválida", () => {
-            expect(response.body).not.toHaveProperty('confirmToken');
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(passwordInvalidMessage);
+            registerFields.verifyNotToken(response);
+            registerFields.verifyInvalidPassword(response);
         });
 
-        and("o status da resposta deve ser 400 com senha inválida", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
 
@@ -296,15 +248,11 @@ defineFeature(feature, (test) => {
         let send, response;
         given(/^que possuo os dados "([^"]*)", "([^"]*)", "([^"]*)", "([^"]*)" e "([^"]*)" pra cadastro com confirmação de senha inválida$/, (cpfPlaceholder, fullNamePlaceholder, emailPlaceholder, passwordPlaceholder, passwordConfirmPlaceholder) => {
             const cpf = generator.generateCpf(cpfPlaceholder);
-
             const email = generator.generateEmail(emailPlaceholder);
-
             const fullName = generator.generateName(fullNamePlaceholder);
             const password = generator.generatePassword(passwordPlaceholder);
             const passwordConfirm = generator.returnPasswordConfirm(passwordConfirmPlaceholder, password);
-
             send = sendRegister(cpf, fullName, email, password, passwordConfirm);
-
         });
 
         when("realizo a requisição de cadastro com confirmação de senha inválida", async () => {
@@ -312,14 +260,12 @@ defineFeature(feature, (test) => {
         });
 
         then("a responta deve conter um erro com confirmação de senha inválida", () => {
-            expect(response.body).not.toHaveProperty('confirmToken');
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(passwordConfirmInvalidMessage);
+            registerFields.verifyNotToken(response);
+            registerFields.verifyInvalidConfirmPassword(response);
         });
 
-        and("o status da resposta deve ser 400 com confirmação de senha inválida", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 400", () => {
+            registerStatus.checkRegisterFail(response);
         });
     });
-
 });
