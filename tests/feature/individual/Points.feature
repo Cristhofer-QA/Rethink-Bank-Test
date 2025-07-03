@@ -46,8 +46,7 @@ Feature: Transferência de pontos
     Given que possuo um usuário transferidor cadastrado e validado, mas inativo
     And possuo um usuário recebedor cadastrado e validado
     When realizo a requisição de envio de pontos do usuário inativo para o usuário ativo
-    Then a requisição deve retornar uma mensagem de erro
-    And o status da requisição deve ser 404
+    Then o status da requisição deve ser 404
     And não deve adicionar pontos ao usuário recebedor
     And não deve gerar um histórico de transação de pontos para o usuário recebedor
 

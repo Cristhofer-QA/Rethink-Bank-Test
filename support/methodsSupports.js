@@ -1,16 +1,17 @@
 const utils = require('../support/utils');
 const endpoints = require('../support/endpoints');
 const userGenerator = require('../generators/userGenerator');
+const confirmEmailStatus = require('../checker/status/confirmEmailStatusCheck').confirmEmailSuccess;
 const loginStatusSuccess = require('../checker/status/loginStatusCheck').loginSuccess;
 const accountStatusSuccess = require('../checker/status/accountStatusCheck').accountSuccess;
-const confirmEmailStatusCheck = require('../checker/status/confirmEmailStatusCheck').confirmEmailSuccess;
+const generalBalanceStatus = require('../checker/status/generalBalanceStatusCheck').successGeneralBalance;
 const { send: sendLogin } = endpoints.login;
 const { send: sendAccount } = endpoints.account;
 const { send: sendRegister } = endpoints.register;
 
 async function confirmEmail(token) {
     const res = await utils.confirmEmail(token);
-    if (res.status !== confirmEmailStatusCheck) {
+    if (res.status !== confirmEmailStatus) {
         throw new Error('Email não foi validado, cenário ignorado');
     };
 };
@@ -47,8 +48,13 @@ async function accountUser(password, bearerToken) {
     return response;
 };
 
-
-
+async function generalBalance(bearerToken = null) {
+    const response = await utils.generalBalance(bearerToken);
+    if (response.status !== generalBalanceStatus) {
+        throw new Error('Usuário não foi deletado, cenário ignorado');
+    };
+    return response;
+};
 
 function verifyUserCreated(userCreated) {
     if (!userCreated) {
@@ -56,12 +62,11 @@ function verifyUserCreated(userCreated) {
     };
 };
 
-
-
 module.exports = {
     loginUser,
     accountUser,
     confirmEmail,
     registerUser,
+    generalBalance,
     verifyUserCreated,
 };
