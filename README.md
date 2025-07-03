@@ -35,6 +35,7 @@ npm  run  run-all
 2. Usuários deletados estão podendo realizar a transferência de pontos.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
+
 ### Endpoint POST /caixinha/deposit
 
 1. Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário.
@@ -49,11 +50,13 @@ npm  run  run-all
 4. Usuários deletados estão podendo realizar a requisição de adição à caixinha.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
+
 ### Endpoint POST /caixinha/withdraw
 1. Usuários deletados estão podendo realizar a requisição de resgate de pontos da caixinha.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 <br>
+
 ## 2 - Se houver bugs, classifique-os em nível de criticidade.
 
 ### Endpoint POST /cadastro
@@ -64,12 +67,14 @@ npm  run  run-all
 
 1. **Crítico** - *Um usuário excluído ter acesso novamente compromete diretamente autorização e segurança, o que pode permitir movimentações indevidas, fraudes e brechas no controle de contas.*
 <br>
+
 #### Endpoint POST /points/send
 
 1. **Crítico** - Perda de pontos em uma transferência causa inconsistência financeira e quebra da confiança do usuário. O sistema não está garantindo a integridade da transação.
 
 2. **Crítico** - Usuários inativos operando transações é um risco de fraude, especialmente num contexto bancário. O sistema falha em aplicar regras de bloqueio.
 <br>
+
 #### Endpoint POST /caixinha/deposit
 1. **Alto** - O sistema não executa a função pretendida, mas não há perda de pontos, apenas falha no armazenamento/uso.
 
@@ -79,6 +84,7 @@ npm  run  run-all
 
 4. **Crítico** - Mesmo princípio que o anterior.
 <br>
+
 #### Endpoint POST /caixinha/withdraw
 
 1. **Crítico** - Resgate por contas inválidas significa retirada indevida de pontos, podendo ser explorado maliciosamente.
