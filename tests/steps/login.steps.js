@@ -94,8 +94,8 @@ defineFeature(feature, (test) => {
             expect(response.body.error).toBe(emailNotConfirmed);
         });
 
-        and("o status da resposta deve ser 400", () => {
-            expect(response.status).toBe(400);
+        and("o status da resposta deve ser 403", () => {
+            expect(response.status).toBe(403);
         });
 
     });

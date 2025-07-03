@@ -46,7 +46,8 @@ npm run run-all
    (Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se p /account não está deletando os usuários). 
 
 3. Endpoint POST /points/send  
-   Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
+   - Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
+   - Usuários deletados estão podendo realizar a transferência de pontos.
 
 4. Endpoint POST /caixinha/deposit
    - Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário. 

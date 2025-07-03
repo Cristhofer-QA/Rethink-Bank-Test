@@ -1,14 +1,13 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/PiggyBank.feature"));
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/PiggyBankDeposit.feature"));
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
 const { send: sendLogin } = endpoints.login;
 const { send: sendAccount } = endpoints.account;
 const { send: sendSendPointsPiggyBank } = endpoints.send_points_piggy_bank;
-const { send: sendWithdraw } = endpoints.withdraw_points_piggy_bank;
-const generator = require('../../generators//userGenerator');
+const generator = require('../../generators/userGenerator');
 
 
 defineFeature(feature, (test) => {
@@ -16,7 +15,6 @@ defineFeature(feature, (test) => {
     const insufficientPointsMessage = 'Saldo insuficiente';
     const accessDeniedMessage = 'Não autorizado';
     const invalidTokenMessage = 'Token inválido ou expirado';
-    const insufficientPointsPiggyBankMessage = 'Saldo na caixinha insuficiente';
 
     let bearerToken;
     let userData;
@@ -106,8 +104,7 @@ defineFeature(feature, (test) => {
     test("Adicionar pontos à caixinha - usuário sem pontos suficientes", ({ given, when, then, and }) => {
 
         let pointsUser;
-        const sendPiggyBank = pointsUser + 1; // Tentando enviar mais pontos do que o usuário possui
-
+        let sendPiggyBank;
         given("que possuo um usuário cadastrado e validado, com pontos", async () => {
             // Esse passo já é tratado no beforeEach
             if (!bearerToken) {
@@ -115,6 +112,7 @@ defineFeature(feature, (test) => {
             }
             const generalBalance = await utils.generalBalance(bearerToken);
             pointsUser = generalBalance.body.normal_balance;
+            sendPiggyBank = parseInt(pointsUser) + 1; // Tentando enviar mais pontos do que o usuário possui
         });
 
         when("realizo a requisição de adição de pontos à caixinha, com um valor maior do que o disponível", async () => {
@@ -244,7 +242,7 @@ defineFeature(feature, (test) => {
 
     test("Enviar pontos negativos à caixinha", ({ given, when, then, and }) => {
 
-        let sendPiggyBank = -59; // Tentando enviar pontos negativos
+        let sendPiggyBank = parseInt(-59); // Tentando enviar pontos negativos
 
         given("que possuo um usuário cadastrado e validado, com pontos", async () => {
             // Esse passo já é tratado no beforeEach
@@ -374,137 +372,4 @@ defineFeature(feature, (test) => {
         });
 
     });
-
-    test("Extrair pontos da caixinha - usuário sem pontos na caixinha", ({ given, when, then, and }) => {
-        // Como o usuário já iniciou com 0 pontos na caixinha, não deve ser possível remover pontos
-        const withdrawnPiggyBank = 25;
-        const piggyBankBalance = 0;
-        let pointsUser;
-        let generalBalanceAfter;
-
-        given("que possuo um usuário cadastrado e validado, sem pontos na caixinha", async () => {
-            if (!bearerToken) {
-                throw new Error('Usuário não logado, cenário ignorado');
-            }
-            const generalBalance = await utils.generalBalance(bearerToken);
-            if (generalBalance.status !== 200) {
-                throw new Error('Erro ao obter saldo geral do usuário, cenário ignorado');
-            }
-            pointsUser = generalBalance.body.normal_balance;
-        });
-
-        when("realizo a requisição de extração de pontos da caixinha", async () => {
-            const send = sendWithdraw(withdrawnPiggyBank);
-            response = await utils.withdrawPointsPiggyBank(send, bearerToken);
-        });
-
-        then("a requisição deve retornar uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(insufficientPointsPiggyBankMessage);
-        });
-
-        and("o status da requisição deve ser 400", () => {
-            expect(response.status).toBe(400);
-        });
-
-        and("não deve subtrair os pontos extraídos da caixinha do usuário", async () => {
-            generalBalanceAfter = await utils.generalBalance(bearerToken);
-            expect(generalBalanceAfter.status).toBe(200);
-            expect(generalBalanceAfter.body).toHaveProperty('piggy_bank_balance');
-            expect(generalBalanceAfter.body.piggy_bank_balance).toBe(piggyBankBalance);
-        });
-
-        and("não deve adicionar os pontos extraídos à quantidade total do usuário", () => {
-            expect(generalBalanceAfter.body).toHaveProperty('normal_balance');
-            expect(generalBalanceAfter.body.normal_balance).toBe(pointsUser);
-
-        });
-
-        and("não deve gerar um histórico de transação de pontos para o usuário", async () => {
-            const extract = await utils.pointsPiggyBankExtract(bearerToken);
-            expect(extract.status).toBe(200);
-            expect(extract.body.length).toBe(0);
-        });
-    });
-
-    test("Extrair pontos da caixinha - usuário não ativo", ({ given, when, then, and }) => {
-        const withdrawnPiggyBank = 25;
-
-        given("que possuo um usuário cadastrado e validado, mas não ativo", async () => {
-            if (!bearerToken) {
-                throw new Error('Usuário não logado, cenário ignorado');
-            }
-            const bodyAccount = sendAccount(userData.password);
-            const responseAccount = await utils.account(bodyAccount, bearerToken);
-            if (responseAccount.status !== 200) {
-                throw new Error('Usuário não desativado, cenário ignorado');
-            }
-        });
-
-        when("realizo a requisição de extração de pontos da caixinha", async () => {
-            const send = sendWithdraw(withdrawnPiggyBank);
-            response = await utils.withdrawPointsPiggyBank(send, bearerToken);
-        });
-
-        then("a requisição deve retornar uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(invalidTokenMessage);
-        });
-
-        and("o status da requisição deve ser 400", () => {
-            expect(response.status).toBe(400);
-        });
-
-    });
-
-    test("Extrair pontos da caixinha - Token não informado", ({ given, when, then, and }) => {
-        const withdrawnPiggyBank = 25;
-
-        given("que possuo um usuário cadastrado e validado", async () => {
-            if (!bearerToken) {
-                throw new Error('Usuário não logado, cenário ignorado');
-            }
-        });
-
-        when("realizo a requisição de extração de pontos da caixinha sem informar o token", async () => {
-            const send = sendWithdraw(withdrawnPiggyBank);
-            response = await utils.withdrawPointsPiggyBank(send, null);
-        });
-
-        then("a requisição deve retornar uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(accessDeniedMessage);
-        });
-
-        and("o status da requisição deve ser 401", () => {
-            expect(response.status).toBe(401);
-        });
-
-    });
-
-    test("Extrair pontos da caixinha - Token inválido", ({ given, when, then, and }) => {
-        const withdrawnPiggyBank = 25;
-
-        given("que possuo um usuário cadastrado e validado", async () => {
-            if (!bearerToken) {
-                throw new Error('Usuário não logado, cenário ignorado');
-            }
-        });
-
-        when("realizo a requisição de extração de pontos da caixinha com um token inválido", async () => {
-            const send = sendWithdraw(withdrawnPiggyBank);
-            response = await utils.withdrawPointsPiggyBank(send, bearerToken.toLowerCase());  // Simulando token inválido
-        });
-
-        then("a requisição deve retornar uma mensagem de erro", () => {
-            expect(response.body).toHaveProperty('error');
-            expect(response.body.error).toBe(invalidTokenMessage);
-        });
-
-        and("o status da requisição deve ser 401", () => {
-            expect(response.status).toBe(401);
-        });
-
-    });
-
 });

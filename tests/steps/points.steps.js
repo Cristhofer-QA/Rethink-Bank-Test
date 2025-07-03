@@ -4,9 +4,9 @@ const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Point
 const utils = require('../../support/utils');
 const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
+const { send: sendAccount } = endpoints.account;
 const { send: sendLogin } = endpoints.login;
 const { send: sendSendPoints } = endpoints.send_point;
-const { send: sendSendPointsPiggyBank } = endpoints.send_points_piggy_bank;
 const generator = require('../../generators//userGenerator');
 
 
@@ -14,9 +14,10 @@ defineFeature(feature, (test) => {
 
     const pointSendedSuccess = 'Pontos enviados com sucesso.';
     const insufficientBalance = 'Saldo insuficiente';
+    const userDestinationNotFound = 'Usuário destino não encontrado';
 
 
-    test.skip("Transferência de pontos correta", ({ given, when, then, and }) => {
+    test("Transferência de pontos correta", ({ given, when, then, and }) => {
         let response;
 
         let sendingUserData = generator.generateUserValid();
@@ -153,7 +154,7 @@ defineFeature(feature, (test) => {
         });
     }, 90000);
 
-    test.skip("Transferência total de pontos", ({ given, when, then, and }) => {
+    test("Transferência total de pontos", ({ given, when, then, and }) => {
         let response;
 
         let sendingUserData = generator.generateUserValid();
@@ -402,9 +403,6 @@ defineFeature(feature, (test) => {
         });
 
         then("a requisição deve retornar uma mensagem de erro", () => {
-            console.log("Response");
-            console.log(response.body);
-            console.log(response.status);
             expect(response.body).toHaveProperty('error');
             expect(response.body.error).toBe(insufficientBalance);
         });
@@ -444,5 +442,355 @@ defineFeature(feature, (test) => {
             expect(extractReceiver.body.length).toBe(0);
         });
     }, 90000);
+
+    test("Transferência de pontos inválida = usuário recebedor não está ativo", ({ given, when, then, and }) => {
+        let response;
+
+        let sendingUserData = generator.generateUserValid();
+        let receivingUserData = generator.generateUserValid();
+
+        let pointsUserSend;
+
+        let pointsSender;
+
+        let bearerTokenSending, bearerTokenReceiving;
+
+        given("que possuo um usuário transferidor cadastrado e validado, com pontos", async () => {
+            const sendUserSen = sendRegister(
+                sendingUserData.cpf,
+                sendingUserData.fullName,
+                sendingUserData.email,
+                sendingUserData.password,
+                sendingUserData.confirmPassword
+            );
+
+            const res = await utils.registerUser(sendUserSen);
+
+            if (res.status !== 201) {
+                throw new Error('Usuário transferidor não cadastrado, cenário ignorado');
+            };
+
+            const confirmToken = res.body.confirmToken;
+
+            const resValid = await utils.confirmEmail(confirmToken);
+
+            if (resValid.status !== 200) {
+                throw new Error('Email do usuário transferidor não validado, cenário ignorado');
+            };
+
+
+            const sendUserLogin = sendLogin(sendingUserData.email, sendingUserData.password);
+            const respLogin = await utils.login(sendUserLogin);
+
+            if (respLogin.status !== 200) {
+                throw new Error('Usuário transferidor não logado, cenário ignorado');
+            }
+
+            bearerTokenSending = respLogin.body.token;
+            const senderUserBalance = await utils.generalBalance(bearerTokenSending);
+            if (senderUserBalance.status !== 200) {
+                throw new Error('Erro ao validar saldo inicial do usuário, cenário ignorado');
+            };
+            pointsUserSend = senderUserBalance.body.normal_balance;
+            pointsSender = parseInt(pointsUserSend) / 2; // Enviando metade dos pontos disponíveis
+        });
+
+        and("possuo um usuário recebedor cadastrado e validado, mas inativo", async () => {
+            const sendUserSen = sendRegister(
+                receivingUserData.cpf,
+                receivingUserData.fullName,
+                receivingUserData.email,
+                receivingUserData.password,
+                receivingUserData.confirmPassword
+            );
+
+            const res = await utils.registerUser(sendUserSen);
+
+            if (res.status !== 201) {
+                throw new Error('Usuário recebedor não cadastrado, cenário ignorado');
+            };
+
+            const confirmToken = res.body.confirmToken;
+
+            const resValid = await utils.confirmEmail(confirmToken);
+
+            if (resValid.status !== 200) {
+                throw new Error('Email do usuário recebedor não validado, cenário ignorado');
+            };
+
+            const receivedUserLogin = sendLogin(receivingUserData.email, receivingUserData.password);
+            const respLoginReceiving = await utils.login(receivedUserLogin);
+            if (respLoginReceiving.status !== 200) {
+                throw new Error('Usuário recebedor não logado, cenário ignorado');
+            }
+
+
+            bearerTokenReceiving = respLoginReceiving.body.token;
+
+            const receivedUserBalance = await utils.generalBalance(bearerTokenReceiving);
+            if (receivedUserBalance.status !== 200) {
+                throw new Error('Erro ao validar saldo inicial do usuário, cenário ignorado');
+            };
+            pointsUserReceiv = receivedUserBalance.body.normal_balance;
+
+            // Inativando o usuário recebedor
+            const sendInactiveUser = sendAccount(receivingUserData.password);
+            const inactivateUser = await utils.account(sendInactiveUser, bearerTokenReceiving);
+
+            if (inactivateUser.status !== 200) {
+                throw new Error('Usuário recebedor não inativado, cenário ignorado');
+            }
+        });
+
+        when("realizo a requisição de envio de pontos para o usuário inativo", async () => {
+            const send = sendSendPoints(receivingUserData.cpf, pointsSender);
+            response = await utils.sendPoints(send, bearerTokenSending);
+        });
+
+        then("a requisição deve retornar uma mensagem de erro", () => {
+
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe(userDestinationNotFound);
+        });
+
+        and("o status da requisição deve ser 404", () => {
+            expect(response.status).toBe(404);
+        });
+
+        and("não deve subtrair pontos do usuário de envio", async () => {
+            const senderUserBalance = await utils.generalBalance(bearerTokenSending);
+            expect(senderUserBalance.status).toBe(200);
+            expect(senderUserBalance.body).toHaveProperty('normal_balance');
+            expect(senderUserBalance.body).toHaveProperty('piggy_bank_balance');
+            expect(senderUserBalance.body.normal_balance).toBe(pointsUserSend);
+            expect(senderUserBalance.body.piggy_bank_balance).toBe(0);
+        });
+
+        and("não deve gerar um histórico de transação de pontos para o usuário de envio", async () => {
+            const extractSender = await utils.extractPoints(bearerTokenSending);
+            balanceSender = extractSender.body;
+            expect(extractSender.status).toBe(200);
+            expect(extractSender.body.length).toBe(0);
+        });
+
+    }, 90000);
+
+    test("Transferência de pontos inválida - usuário de envio não está ativo", ({ given, when, then, and }) => {
+        let response;
+
+        let sendingUserData = generator.generateUserValid();
+        let receivingUserData = generator.generateUserValid();
+
+        let pointsUserSend;
+
+        let pointsSender;
+
+        let bearerTokenSending, bearerTokenReceiving;
+
+        given("que possuo um usuário transferidor cadastrado e validado, mas inativo", async () => {
+            const sendUserSen = sendRegister(
+                sendingUserData.cpf,
+                sendingUserData.fullName,
+                sendingUserData.email,
+                sendingUserData.password,
+                sendingUserData.confirmPassword
+            );
+
+            const res = await utils.registerUser(sendUserSen);
+
+            if (res.status !== 201) {
+                throw new Error('Usuário transferidor não cadastrado, cenário ignorado');
+            };
+
+            const confirmToken = res.body.confirmToken;
+
+            const resValid = await utils.confirmEmail(confirmToken);
+
+            if (resValid.status !== 200) {
+                throw new Error('Email do usuário transferidor não validado, cenário ignorado');
+            };
+
+
+            const sendUserLogin = sendLogin(sendingUserData.email, sendingUserData.password);
+            const respLogin = await utils.login(sendUserLogin);
+
+            if (respLogin.status !== 200) {
+                throw new Error('Usuário transferidor não logado, cenário ignorado');
+            }
+
+            bearerTokenSending = respLogin.body.token;
+            const senderUserBalance = await utils.generalBalance(bearerTokenSending);
+            if (senderUserBalance.status !== 200) {
+                throw new Error('Erro ao validar saldo inicial do usuário, cenário ignorado');
+            };
+            pointsUserSend = senderUserBalance.body.normal_balance;
+            pointsSender = parseInt(pointsUserSend) / 2; // Enviando metade dos pontos disponíveis
+
+            // Inativando o usuário transferidor
+            const sendInactiveUser = sendAccount(sendingUserData.password);
+            const inactivateUser = await utils.account(sendInactiveUser, bearerTokenSending);
+
+            if (inactivateUser.status !== 200) {
+                throw new Error('Usuário transferidor não inativado, cenário ignorado');
+            }
+        });
+
+        and("possuo um usuário recebedor cadastrado e validado", async () => {
+            const sendUserSen = sendRegister(
+                receivingUserData.cpf,
+                receivingUserData.fullName,
+                receivingUserData.email,
+                receivingUserData.password,
+                receivingUserData.confirmPassword
+            );
+
+            const res = await utils.registerUser(sendUserSen);
+
+            if (res.status !== 201) {
+                throw new Error('Usuário recebedor não cadastrado, cenário ignorado');
+            };
+
+            const confirmToken = res.body.confirmToken;
+
+            const resValid = await utils.confirmEmail(confirmToken);
+
+            if (resValid.status !== 200) {
+                throw new Error('Email do usuário recebedor não validado, cenário ignorado');
+            };
+
+            const receivedUserLogin = sendLogin(receivingUserData.email, receivingUserData.password);
+            const respLoginReceiving = await utils.login(receivedUserLogin);
+            if (respLoginReceiving.status !== 200) {
+                throw new Error('Usuário recebedor não logado, cenário ignorado');
+            }
+
+
+            bearerTokenReceiving = respLoginReceiving.body.token;
+
+            const receivedUserBalance = await utils.generalBalance(bearerTokenReceiving);
+            if (receivedUserBalance.status !== 200) {
+                throw new Error('Erro ao validar saldo inicial do usuário, cenário ignorado');
+            };
+            pointsUserReceiv = receivedUserBalance.body.normal_balance;
+
+        });
+
+        when("realizo a requisição de envio de pontos do usuário inativo para o usuário ativo", async () => {
+            const send = sendSendPoints(receivingUserData.cpf, pointsSender);
+            response = await utils.sendPoints(send, bearerTokenSending);
+        });
+
+        then("a requisição deve retornar uma mensagem de erro", () => {
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe(userDestinationNotFound);
+        });
+
+        and("o status da requisição deve ser 404", () => {
+            expect(response.status).toBe(404);
+        });
+
+        and("não deve adicionar pontos ao usuário recebedor", async () => {
+            const receivedUserBalance = await utils.generalBalance(bearerTokenReceiving);
+            expect(receivedUserBalance.status).toBe(200);
+            expect(receivedUserBalance.body).toHaveProperty('normal_balance');
+            expect(receivedUserBalance.body).toHaveProperty('piggy_bank_balance');
+            expect(receivedUserBalance.body.normal_balance).toBe(pointsUserSend);
+            expect(receivedUserBalance.body.piggy_bank_balance).toBe(0);
+        });
+
+        and("não deve gerar um histórico de transação de pontos para o usuário recebedor", async () => {
+            const extractReceiv = await utils.extractPoints(bearerTokenReceiving);
+            balanceSender = extractReceiv.body;
+            expect(extractReceiv.status).toBe(200);
+            expect(extractReceiv.body.length).toBe(0);
+        });
+
+    }, 90000);
+
+    test("Transferência de pontos inválida - usuário recebedor não existe", ({ given, when, then, and }) => {
+        let response;
+
+        let sendingUserData = generator.generateUserValid();
+        let receivingUserData = generator.generateUserValid();
+
+        let pointsUserSend;
+
+        let pointsSender;
+
+        let bearerTokenSending, bearerTokenReceiving;
+
+        given("que possuo um usuário transferidor cadastrado e validado, com pontos", async () => {
+            const sendUserSen = sendRegister(
+                sendingUserData.cpf,
+                sendingUserData.fullName,
+                sendingUserData.email,
+                sendingUserData.password,
+                sendingUserData.confirmPassword
+            );
+
+            const res = await utils.registerUser(sendUserSen);
+
+            if (res.status !== 201) {
+                throw new Error('Usuário transferidor não cadastrado, cenário ignorado');
+            };
+
+            const confirmToken = res.body.confirmToken;
+
+            const resValid = await utils.confirmEmail(confirmToken);
+
+            if (resValid.status !== 200) {
+                throw new Error('Email do usuário transferidor não validado, cenário ignorado');
+            };
+
+
+            const sendUserLogin = sendLogin(sendingUserData.email, sendingUserData.password);
+            const respLogin = await utils.login(sendUserLogin);
+
+            if (respLogin.status !== 200) {
+                throw new Error('Usuário transferidor não logado, cenário ignorado');
+            }
+
+            bearerTokenSending = respLogin.body.token;
+            const senderUserBalance = await utils.generalBalance(bearerTokenSending);
+            if (senderUserBalance.status !== 200) {
+                throw new Error('Erro ao validar saldo inicial do usuário, cenário ignorado');
+            };
+            pointsUserSend = senderUserBalance.body.normal_balance;
+            pointsSender = parseInt(pointsUserSend) / 2; // Enviando metade dos pontos disponíveis
+
+        });
+
+        when("realizo a requisição de envio de pontos para um usuário inexistente", async () => {
+            const send = sendSendPoints(receivingUserData.cpf + '1', pointsSender);
+            response = await utils.sendPoints(send, bearerTokenSending);
+        });
+
+        then("a requisição deve retornar uma mensagem de erro", () => {
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe(userDestinationNotFound);
+        });
+
+        and("o status da requisição deve ser 404", () => {
+            expect(response.status).toBe(404);
+        });
+
+        and("não deve subtrair pontos do usuário de envio", async () => {
+            const receivedUserBalance = await utils.generalBalance(bearerTokenSending);
+            expect(receivedUserBalance.status).toBe(200);
+            expect(receivedUserBalance.body).toHaveProperty('normal_balance');
+            expect(receivedUserBalance.body).toHaveProperty('piggy_bank_balance');
+            expect(receivedUserBalance.body.normal_balance).toBe(pointsUserSend);
+            expect(receivedUserBalance.body.piggy_bank_balance).toBe(0);
+        });
+
+        and("não deve gerar um histórico de transação de pontos para o usuário de envio", async () => {
+            const extractReceiv = await utils.extractPoints(bearerTokenSending);
+            balanceSender = extractReceiv.body;
+            expect(extractReceiv.status).toBe(200);
+            expect(extractReceiv.body.length).toBe(0);
+        });
+
+    }, 90000);
+
 
 });
