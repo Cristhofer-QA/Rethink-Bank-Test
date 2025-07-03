@@ -36,41 +36,41 @@ A execução dos testes — tanto manual quanto via CI — gera um relatório au
 **Resposta:** Sim! Os bugs estão descritos abaixo. Além disso, na seção de Anotações, apresento detalhes e possíveis inconsistências que exigem documentação para confirmação.
 
 #### Endpoint POST /cadastro
-1. Cadastra o usuário quando a senha não possui números (que é pré-requisito).
-- *Nesse caso, não deve permitir o cadastro, visto que o número na senha é obrigatório.*
+1. Cadastra o usuário quando a senha não possui números (que é pré-requisito).  
+&nbsp;&nbsp;&nbsp;&nbsp; - *Nesse caso, não deve permitir o cadastro, visto que o número na senha é obrigatório.*
 <br>
 
 #### Endpoint POST /login
-1. Está permitindo usuário deletado (/account) logar no sistema.(Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se o /account não está deletando os usuários).
-- *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
+1. Está permitindo usuário deletado (/account) logar no sistema. Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se o /account não está deletando os usuários.  
+&nbsp;&nbsp;&nbsp;&nbsp; - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
 #### Endpoint POST /points/send
-1. Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
-- *O esperado é que, se a solicitação for concluída, adicionar o valor transferido à conta do usuário que o recebeu.*
+1. Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.  
+&nbsp;&nbsp;&nbsp;&nbsp;  - *O esperado é que, se a solicitação for concluída, adicionar o valor transferido à conta do usuário que o recebeu.*
 
-2. Usuários deletados estão podendo realizar a transferência de pontos.
-- *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
+2. Usuários deletados estão podendo realizar a transferência de pontos.  
+&nbsp;&nbsp;&nbsp;&nbsp;  - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
 #### Endpoint POST /caixinha/deposit
 
-1. Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário.
-- *Quando os pontos são enviados à caixinha de forma correta, deve-se acrescentar o valor enviado ao já presente na caixinha.*
+1. Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário.  
+ &nbsp;&nbsp;&nbsp;&nbsp; - *Quando os pontos são enviados à caixinha de forma correta, deve-se acrescentar o valor enviado ao já presente na caixinha.*
 
-2. Os pontos enviados à caixinha não estão sendo debitados dos pontos 'normais' do usuário**
-- *Aqui, não consigo definir se é um erro, pois, como não está creditando na caixinha, pode ser que não esteja debitando dos pontos 'normais' do usuário*
+2. Os pontos enviados à caixinha não estão sendo debitados dos pontos 'normais' do usuário**  
+ &nbsp;&nbsp;&nbsp;&nbsp; - *Aqui, não consigo definir se é um erro, pois, como não está creditando na caixinha, pode ser que não esteja debitando dos pontos 'normais' do usuário*
 
-3. Está sendo possível enviar valores inválidos no body da requisição. Por exemplo: números negativos e letras. (Possivelmente não realiza nenhuma ação, mas não consigo validar, pois não está adicionando valores à caixinha).
-- *Por se tratar de transferência de valores, mesmo não realizando nenhuma ação, deve-se aceitar apenas valores válidos, ou seja inteiros positivos*
+3. Está sendo possível enviar valores inválidos no body da requisição. Por exemplo: números negativos e letras. (Possivelmente não realiza nenhuma ação, mas não consigo validar, pois não está adicionando valores à caixinha).  
+ &nbsp;&nbsp;&nbsp;&nbsp; - *Por se tratar de transferência de valores, mesmo não realizando nenhuma ação, deve-se aceitar apenas valores válidos, ou seja inteiros positivos*
 
-4. Usuários deletados estão podendo realizar a requisição de adição à caixinha.
-- *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
+4. Usuários deletados estão podendo realizar a requisição de adição à caixinha.  
+ &nbsp;&nbsp;&nbsp;&nbsp; - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
 #### Endpoint POST /caixinha/withdraw
-1. Usuários deletados estão podendo realizar a requisição de resgate de pontos da caixinha.
-- *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
+1. Usuários deletados estão podendo realizar a requisição de resgate de pontos da caixinha.  
+&nbsp;&nbsp;&nbsp;&nbsp;  - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 <br>
 
