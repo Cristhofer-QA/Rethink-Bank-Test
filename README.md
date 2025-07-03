@@ -5,7 +5,7 @@ Repositório criado para realização de testes de API utilizando Jest, Cucumber
 <br>
 <br>
 
-# Como rodar o projeto
+## Como rodar o projeto
 
 Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
 
@@ -18,33 +18,34 @@ Além disso, é possível executá-lo via CI, pelo Github Actions.
 Para isso, basta executar o Workflow "API Tests CI".
 <br>
 <br>
-A execução, tanto manual (npm  run  run-all) quanto via Github Actions, gera um relatório de execução.
-<br>
-Se executado manualmente, o relatório se encontra na pasta 'reports', localizada na raiz do projeto.
-<br>
-Já se for executado via Github Actions, fica salvo na seção 'Artifacts'.
+
+## Relatórios de execução
+
+A execução dos testes — tanto manual quanto via CI — gera um relatório automaticamente:
+- Execução manual: o relatório estará disponível na pasta reports, localizada na raiz do projeto.
+- Execução via GitHub Actions: o relatório estará disponível na aba Artifacts, dentro da execução do workflow.
 <br>
 <br>
 <br>
 
 
-# RESPONDENDO AS PERGUNTAS
+## RESPONDENDO AS PERGUNTAS
 
-## 1 - Há bugs? Se sim, quais são e quais são os cenários esperados?
+### 1 - Há bugs? Se sim, quais são e quais são os cenários esperados?
 
 **Resposta:** Sim! Eu peguei os bugs relatados abaixo. Além dos bugs, na seção de "Anotações", descrevo alguns detalhes e (talvez) inconsistências do sistema, onde para informar se é um erro ou não, é necessária a documentação e entendimento completo da regra de negócios.
 
-### Endpoint POST /cadastro
+#### Endpoint POST /cadastro
 1. Cadastra o usuário quando a senha não possui números (que é pré-requisito).
 - *Nesse caso, não deve permitir o cadastro, visto que o número na senha é obrigatório.*
 <br>
 
-### Endpoint POST /login
+#### Endpoint POST /login
 1. Está permitindo usuário deletado (/account) logar no sistema.(Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se o /account não está deletando os usuários).
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
-### Endpoint POST /points/send
+#### Endpoint POST /points/send
 1. Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
 - *O esperado é que, se a solicitação for concluída, adicionar o valor transferido à conta do usuário que o recebeu.*
 
@@ -52,7 +53,7 @@ Já se for executado via Github Actions, fica salvo na seção 'Artifacts'.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
-### Endpoint POST /caixinha/deposit
+#### Endpoint POST /caixinha/deposit
 
 1. Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário.
 - *Quando os pontos são enviados à caixinha de forma correta, deve-se acrescentar o valor enviado ao já presente na caixinha.*
@@ -67,19 +68,19 @@ Já se for executado via Github Actions, fica salvo na seção 'Artifacts'.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 
-### Endpoint POST /caixinha/withdraw
+#### Endpoint POST /caixinha/withdraw
 1. Usuários deletados estão podendo realizar a requisição de resgate de pontos da caixinha.
 - *Acredito que, para todas as requisições, é obrigatório o usuário estar ativo no sistema*
 <br>
 <br>
 
-## 2 - Se houver bugs, classifique-os em nível de criticidade.
+### 2 - Se houver bugs, classifique-os em nível de criticidade.
 
-### Endpoint POST /cadastro
+#### Endpoint POST /cadastro
 1. **Alto** - *Ignorar critérios de segurança no cadastro de senha expõe o sistema a vulnerabilidades sérias, como senhas fracas e facilidade de invasão. Porém, não é nenhum impeditivo de utilização do sistema.*
 
   
-### Endpoint POST /login
+#### Endpoint POST /login
 
 1. **Crítico** - *Um usuário excluído ter acesso novamente compromete diretamente autorização e segurança, o que pode permitir movimentações indevidas, fraudes e brechas no controle de contas.*
 <br>
@@ -107,14 +108,14 @@ Já se for executado via Github Actions, fica salvo na seção 'Artifacts'.
 <br>
 <br>
 
-## 3 - Diante do cenário, o sistema está pronto para subir em produção?
+### 3 - Diante do cenário, o sistema está pronto para subir em produção?
 Resposta: Não! Acredito que o sistema tenha muitas falhas, tanto de segurança, quanto das funcionalidades principais.
 
 <br>
 <br>
 <br>
 
-# Anotações
+## Anotações
 
 1. Ao tentar cadastrar um usuário com um CPF já cadastrado, está retornando o status code 400, porém o erro retornado é estranho. Como se não fosse tratado. O mesmo acontece com o cadastro de e-mail já existente. Segue o erro retornado (cpf duplicado):
 ```bash
