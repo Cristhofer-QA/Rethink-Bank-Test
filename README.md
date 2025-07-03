@@ -13,8 +13,10 @@ Clone o repositório e acesse a pasta raiz. Nela, execute o comando:
 npm  run  run-all
 ```
 <br>
-Além disso, é possível executá-lo via CI, pelo Github Actions.  
+Além disso, é possível executá-lo via CI, pelo Github Actions.
+<br>
 Para isso, basta executar o Workflow "API Tests CI".
+<br>
 <br>
 A execução, tanto manual (npm  run  run-all) quanto via Github Actions, gera um relatório de execução.
 <br>
