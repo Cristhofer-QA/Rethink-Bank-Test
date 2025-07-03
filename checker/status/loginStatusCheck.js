@@ -1,6 +1,6 @@
 const loginSuccess = 200;
-const credentialsInvalid = 400;
 const emailNotConfirmed = 403;
+const credentialsInvalid = 400;
 
 function loginSuccessStatusCheck(response) {
     expect(response.status).toBe(loginSuccess);

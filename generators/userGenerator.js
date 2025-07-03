@@ -14,9 +14,8 @@ function generateUserValid() {
         email: email,
         password: password,
         confirmPassword: confirmPassword
-    }
-}
-
+    };
+};
 
 module.exports = {
     generateUserValid,

@@ -1,12 +1,8 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
-const endpoints = require('../../support/endpoints');
-const { send: sendRegister } = endpoints.register;
-const { send: sendAccount } = endpoints.account;
-const { send: sendLogin } = endpoints.login;
-const { send: sendSendPoints } = endpoints.send_point;
 const path = require("path");
 const utils = require('../../support/utils');
 const feature = loadFeature(path.resolve(__dirname, "../feature/individual/Points.feature"));
+const endpoints = require('../../support/endpoints');
 const generator = require('../../generators//userGenerator');
 const pointsFields = require('../../checker/fields/sendPointsFieldsCheck');
 const pointsStatus = require('../../checker/status/sendPointsStatusCheck');
@@ -14,6 +10,7 @@ const methodsSupports = require('../../support/methodsSupports');
 const extractPointsStatus = require('../../checker/status/extractPointsStatusCheck');
 const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
 const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
+const { send: sendSendPoints } = endpoints.send_point;
 
 
 defineFeature(feature, (test) => {
@@ -23,7 +20,6 @@ defineFeature(feature, (test) => {
     let bearerTokenUserSend, bearerTokenUserReceive;
     let pointsUserSend, pointsUserReceive;
     let piggyBankSend, piggyBankReceive;
-
     let balanceSender;
 
     beforeEach(async () => {
@@ -59,7 +55,6 @@ defineFeature(feature, (test) => {
             const points = await methodsSupports.generalBalance(bearerTokenUserReceive);
             pointsUserReceive = points.body.normal_balance;
             piggyBankReceive = points.body.piggy_bank_balance;
-
         });
 
         when("realizo a requisição de envio de pontos corretamente", async () => {
@@ -185,7 +180,6 @@ defineFeature(feature, (test) => {
             expect(extractReceiver.body[0].created_at).toBe(balanceSender[0].created_at);
         });
     }, 90000);
-
 
     test("Transferência de pontos inválida - saldo insuficiente", ({ given, when, then, and }) => {
         let response;
@@ -346,7 +340,6 @@ defineFeature(feature, (test) => {
             extractPointsStatus.extractPointsSuccessCheck(extractReceiv);
             expect(extractReceiv.body.length).toBe(0);
         });
-
     }, 90000);
 
     test("Transferência de pontos inválida - usuário recebedor não existe", ({ given, when, then, and }) => {
@@ -363,7 +356,6 @@ defineFeature(feature, (test) => {
             piggyBankSend = points.body.piggy_bank_balance;
             pointsUserSend = points.body.normal_balance;
             pointsSender = parseInt(pointsUserSend / 2); // Enviando metade dos pontos disponíveis
-
         });
 
         when("realizo a requisição de envio de pontos para um usuário inexistente", async () => {
@@ -392,6 +384,4 @@ defineFeature(feature, (test) => {
         });
 
     }, 90000);
-
-
 });

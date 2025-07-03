@@ -1,16 +1,16 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/PiggyBankWithdraw.feature"));
 const utils = require('../../support/utils');
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/PiggyBankWithdraw.feature"));
 const endpoints = require('../../support/endpoints');
-const { send: sendWithdraw } = endpoints.withdraw_points_piggy_bank;
 const methodsSupports = require('../../support/methodsSupports');
-const withdrawnPiggyBankFields = require('../../checker/fields/withdrawPiggyBankFieldsCheck');
-const withdrawnPiggyBankStatus = require('../../checker/status/withdrawPiggyBankStatusCheck');
 const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
 const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
 const balancePiggyBankStatus = require('../../checker/status/balancePiggyBankStatusCheck');
+const withdrawnPiggyBankFields = require('../../checker/fields/withdrawPiggyBankFieldsCheck');
+const withdrawnPiggyBankStatus = require('../../checker/status/withdrawPiggyBankStatusCheck');
 const extractPointsPiggyBankStatus = require('../../checker/status/piggyBankExtractStatusCheck');
+const { send: sendWithdraw } = endpoints.withdraw_points_piggy_bank;
 
 defineFeature(feature, (test) => {
     let response;
@@ -125,7 +125,6 @@ defineFeature(feature, (test) => {
         and("o status da requisição deve ser 400", () => {
             withdrawnPiggyBankStatus.withdrawPiggyPiggyBankFailCheck(response);
         });
-
     });
 
     test("Extrair pontos da caixinha - Token não informado", ({ given, when, then, and }) => {
@@ -151,7 +150,6 @@ defineFeature(feature, (test) => {
         and("o status da requisição deve ser 401", () => {
             withdrawnPiggyBankStatus.withdrawPiggyBankAccessDenied(response);
         });
-
     });
 
     test("Extrair pontos da caixinha - Token inválido", ({ given, when, then, and }) => {
@@ -177,7 +175,5 @@ defineFeature(feature, (test) => {
         and("o status da requisição deve ser 401", () => {
             withdrawnPiggyBankStatus.withdrawPiggyBankAccessDenied(response);
         });
-
     });
-
 });

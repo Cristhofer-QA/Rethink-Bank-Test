@@ -1,7 +1,7 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/ConfirmEmail.feature"));
 const utils = require('../../support/utils');
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/ConfirmEmail.feature"));
 const methodsSupports = require('../../support/methodsSupports');
 const confirmEmailFields = require('../../checker/fields/confirmEmailFieldsCheck');
 const confirmEmailStatus = require('../../checker/status/confirmEmailStatusCheck');
@@ -17,7 +17,6 @@ defineFeature(feature, (test) => {
     });
 
     test("Confirmação correta de e-mail", ({ given, when, then, and }) => {
-
         given('que tenho um usuário cadastrado que não possua e-mail confirmado', async () => {
             methodsSupports.verifyUserCreated();
         });

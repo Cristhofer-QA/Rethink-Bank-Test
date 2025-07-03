@@ -1,6 +1,6 @@
-const invalidPasswordMessage = 'Senha inválida';
 const unauthorizedMessage = 'Não autorizado';
 const accountSuccessMessage = 'Conta marcada como deletada.';
+const invalidPasswordMessage = 'Senha inválida';
 
 
 function verifyErrorAccount(body, message) {
@@ -20,8 +20,6 @@ function verifyAccountSuccessMessage(response) {
     expect(response.body).toHaveProperty("message");
     expect(response.body.message).toBe(accountSuccessMessage);
 };
-
-
 
 
 module.exports = {

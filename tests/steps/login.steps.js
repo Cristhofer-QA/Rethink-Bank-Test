@@ -170,7 +170,7 @@ defineFeature(feature, (test) => {
                 emailSend = null;
                 passwordSend = null;
             };
-            
+
             send = sendLogin(emailSend, passwordSend);
             response = await utils.login(send);
 

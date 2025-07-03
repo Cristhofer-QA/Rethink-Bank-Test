@@ -2,9 +2,7 @@ const supertest = require('supertest');
 
 function createClient(bearerToken = null, token = null) {
     const client = supertest(process.env.API_BASE_URL);
-
     const appendTokenToUrl = (path) => {
-        
         if (token) {
             const separator = path.includes('?') ? '&' : '?';
             return `${path}${separator}token=${token}`;

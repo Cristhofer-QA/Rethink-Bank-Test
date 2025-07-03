@@ -1,17 +1,16 @@
 const { defineFeature, loadFeature } = require("jest-cucumber");
 const path = require("path");
-const feature = loadFeature(path.resolve(__dirname, "../feature/individual/RegisterUser.feature"));
 const utils = require('../../support/utils');
+const feature = loadFeature(path.resolve(__dirname, "../feature/individual/RegisterUser.feature"));
 const endpoints = require('../../support/endpoints');
-const { send: sendRegister } = endpoints.register;
 const generator = require('../../generators/baseGenerator');
-const featureVar = require('../../variables/featuresVariables')
 const userGenerator = require('../../generators/userGenerator');
 const methodsSupports = require('../../support/methodsSupports');
 const registerStatus = require('../../checker/status/registerStatusCheck');
 const registerFields = require('../../checker/fields/registerFieldsCheck');
 const generalBalanceFields = require('../../checker/fields/generalBalanceFieldCheck');
 const generalBalanceStatus = require('../../checker/status/generalBalanceStatusCheck');
+const { send: sendRegister } = endpoints.register;
 
 defineFeature(feature, (test) => {
 
@@ -34,7 +33,6 @@ defineFeature(feature, (test) => {
         and("o status da resposta deve ser 201", () => {
             registerStatus.checkRegisterSuccess(response);
         });
-
     });
 
     test("Cadastro de usuário corretamente e verificação dos 100 pontos iniciais", ({ given, when, then, and }) => {
@@ -60,7 +58,6 @@ defineFeature(feature, (test) => {
         and("o status da consulta deve ser 200", () => {
             generalBalanceStatus.checkGeneralBalanceSuccess(response);
         });
-
     });
 
     test("Cadastro com CPF já cadastrado", ({ given, when, then, and }) => {

@@ -1,9 +1,8 @@
 const successRegistrationMessage = 'Cadastro realizado com sucesso.';
-
 const cpfInvalidMessage = 'CPF inválido';
+const emailInvalidMessage = 'Email inválido';
 const passwordInvalidMessage = 'Senha fraca';
 const fullNameInvalidMessage = 'Nome completo obrigatório';
-const emailInvalidMessage = 'Email inválido';
 const cpfAlreadyRegisteredMessage = 'duplicate key value violates unique constraint \"users_cpf_key\"';
 const passwordConfirmInvalidMessage = 'Senhas não conferem';
 const emailAlreadyRegisteredMessage = 'duplicate key value violates unique constraint \"users_email_key\"';

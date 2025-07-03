@@ -1,14 +1,11 @@
 const { faker } = require('@faker-js/faker');
 const featureVar = require('../variables/featuresVariables')
-
 const alphabet = [
     'a', 'b', 'c', 'd', 'e', 'f', 'g',
     'h', 'i', 'j', 'k', 'l', 'm', 'n',
     'o', 'p', 'q', 'r', 's', 't', 'u',
     'v', 'w', 'x', 'y', 'z'
 ];
-
-
 const specialCharacters = [
     '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
     '-', '_', '+', '=', '{', '}', '[', ']', '|', '\\',
@@ -16,21 +13,19 @@ const specialCharacters = [
 ];
 
 
+
 // Person
 function generateFullName() {
     return faker.person.fullName();
 };
 
-
 function generateFirstName() {
     return faker.person.firstName();
 };
 
-
 function generateLastName() {
     return faker.person.lastName();
 };
-
 
 function generateOneName() {
     const firstName = generateFirstName();
@@ -49,7 +44,6 @@ function generateName(typeName) {
             return null;
     };
 };
-
 
 function generateCpf(typeCpf) {
     withPunctuation = false;
@@ -93,6 +87,7 @@ function generateCpf(typeCpf) {
 };
 
 
+
 // Internet
 function generateEmail(typeEmail) {
     const email = faker.internet.email().toLowerCase();
@@ -120,14 +115,13 @@ function returnPasswordConfirm(typePassword, password) {
     };
 }
 
-
 function generatePassword(typePassword, lengthPassword = 8) {
+    let passwordReturn = "";
     let length = lengthPassword
     let useNumber = true;
     let useSpecialChars = true;
     let useCapitalLetter = true;
     let useLowercaseLetter = true;
-
 
     switch (typePassword) {
         case featureVar.passwordMinusDigit:
@@ -147,10 +141,8 @@ function generatePassword(typePassword, lengthPassword = 8) {
             break;
         case featureVar.null:
             return null;
-    }
+    };
 
-
-    let passwordReturn = "";
     while (passwordReturn.length < length) {
         if (useLowercaseLetter) {
             passwordReturn = passwordReturn + generateString(1);
@@ -170,7 +162,6 @@ function generatePassword(typePassword, lengthPassword = 8) {
         };
     };
     return passwordReturn.slice(0, length);
-
 };
 
 
@@ -196,16 +187,13 @@ function generateString(length = 10, capitalLetter = false) {
     };
 };
 
-
 function generateAccentedChar() {
     return accentedLetters[Math.floor(Math.random() * accentedLetters.length)];
 }
 
-
 function generateSpecialCharacter() {
     return specialCharacters[Math.floor(Math.random() * specialCharacters.length)];
 }
-
 
 module.exports = {
     generateFullName,

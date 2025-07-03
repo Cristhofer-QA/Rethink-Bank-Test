@@ -1,6 +1,6 @@
-const sendPointsSuccess = 200;
-const sendPointsFail = 400;
 const userNotFound = 404;
+const sendPointsFail = 400;
+const sendPointsSuccess = 200;
 
 function sendPointsStatusCheck(response) {
     expect(response.status).toBe(sendPointsSuccess);

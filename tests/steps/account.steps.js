@@ -156,7 +156,7 @@ defineFeature(feature, (test) => {
     });
 
     test("Exclusão de conta não informando o bearer token", ({ given, when, then, and }) => {
-        let send, response, bearerToken;
+        let send, response;
 
         given("que tenha um usuário cadastrado com um e-mail já confirmado", async () => {
             supportMethods.verifyUserCreated(userCreated);
@@ -164,7 +164,7 @@ defineFeature(feature, (test) => {
         });
 
         when("logo no sistema com esse usuário", async () => {
-            bearerToken = await supportMethods.loginUser(userData.email, userData.password);
+            await supportMethods.loginUser(userData.email, userData.password);
         });
 
         and("realizo a requisição de exclusão de conta, com dados corretos, mas sem bearer token", async () => {

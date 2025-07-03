@@ -7,5 +7,4 @@ function piggyBankExtractSuccessCheck(response) {
 module.exports = {
     piggyBankExtractSuccessCheck,
     piggyBankExtractSuccess
-
 };
