@@ -16,7 +16,8 @@ npm  run  run-all
 Além disso, é possível executá-lo via CI, pelo Github Actions.  
 Para isso, basta executar o Workflow "API Tests CI".
 <br>
-A execução, tanto manual (npm  run  run-all) quanto via Github Actions, gera um relatório de execução.  
+A execução, tanto manual (npm  run  run-all) quanto via Github Actions, gera um relatório de execução.
+<br>
 Se executado manualmente, o relatório se encontra na pasta 'reports', localizada na raiz do projeto.
 <br>
 Já se for executado via Github Actions, fica salvo na seção 'Artifacts'.
