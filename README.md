@@ -33,7 +33,7 @@ A execução dos testes — tanto manual quanto via CI — gera um relatório au
 
 ### 1 - Há bugs? Se sim, quais são e quais são os cenários esperados?
 
-**Resposta:** Sim! Eu peguei os bugs relatados abaixo. Além dos bugs, na seção de "Anotações", descrevo alguns detalhes e (talvez) inconsistências do sistema, onde para informar se é um erro ou não, é necessária a documentação e entendimento completo da regra de negócios.
+**Resposta:** Sim! Os bugs estão descritos abaixo. Além disso, na seção de Anotações, apresento detalhes e possíveis inconsistências que exigem documentação para confirmação.
 
 #### Endpoint POST /cadastro
 1. Cadastra o usuário quando a senha não possui números (que é pré-requisito).
