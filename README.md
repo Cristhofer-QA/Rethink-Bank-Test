@@ -32,6 +32,9 @@ npm run run-all
 
 4. O mesmo 'erro' do ponto 3 acontece para o endpoint de exclusão de usuário (/account).
 
+5. Na documentação não deixa claro se o usuário deletado não pode conseguir realizar a transferência ou o resgate de pontos para a caixinha.  
+   Todavia, ESTÁ permitindo. Acredito que possa ser um erro.
+
 
 ## Erros encontrados
 
@@ -39,8 +42,16 @@ npm run run-all
    Cadastra o usuário quando a senha não possui números (que é pré-requisito).
 
 2. Endpoint POST /login  
-   Está permitindo usuário deletado (/account) logar no sistema.
+   Está permitindo usuário deletado (/account) logar no sistema.  
    (Não consigo saber se é o /login que está permitindo o login usuários de excluídos ou se p /account não está deletando os usuários). 
 
 3. Endpoint POST /points/send  
    Os pontos enviados (de forma correta) não está sendo creditado na conta do usuário que está recebendo.
+
+4. Endpoint POST /caixinha/deposit
+   - Os pontos enviados à caixinha não estão sendo creditado na caixinha do usuário. 
+   - Está sendo possível enviar valores inválidos no body da requisição. Por exemplo: números negativos e letras. (Possivelmente não realiza nenhuma ação, mas não consigo validar, pois não está adicionando valores à caixinha).
+   - Usuários deletados estão podendo realizar a requisição de adição à caixinha.
+
+5. Endpoint POST /caixinha/withdraw
+   - Usuários deletados estão podendo realizar a requisição de resgate de pontos da caixinha.

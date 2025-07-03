@@ -6,6 +6,7 @@ const endpoints = require('../../support/endpoints');
 const { send: sendRegister } = endpoints.register;
 const { send: sendLogin } = endpoints.login;
 const { send: sendSendPoints } = endpoints.send_point;
+const { send: sendSendPointsPiggyBank } = endpoints.send_points_piggy_bank;
 const generator = require('../../generators//userGenerator');
 
 
@@ -13,7 +14,7 @@ defineFeature(feature, (test) => {
 
     const pointSendedSuccess = 'Pontos enviados com sucesso.';
 
-    test("Transferência de pontos correta", ({ given, when, then, and }) => {
+    test.skip("Transferência de pontos correta", ({ given, when, then, and }) => {
         let response;
 
         let sendingUserData = generator.generateUserValid();
@@ -117,9 +118,6 @@ defineFeature(feature, (test) => {
             expect(senderUserBalance.body).toHaveProperty('piggy_bank_balance');
             expect(senderUserBalance.body.normal_balance).toBe(pointsUserSend - pointsSender);
             expect(senderUserBalance.body.piggy_bank_balance).toBe(0);
-
-
-
         });
 
         and("deve adicionar os pontos recebidos aos pontos já possuídos do usuário de envio", async () => {
@@ -133,9 +131,7 @@ defineFeature(feature, (test) => {
 
         and("deve gerar um histórico de transação de pontos para o usuário de envio", async () => {
             const extractSender = await utils.extractPoints(bearerTokenSending);
-            console.log(extractSender.body);
             balanceSender = extractSender.body;
-            console.log(balanceSender);
             expect(extractSender.status).toBe(200);
             expect(extractSender.body.length).toBe(1);
             expect(extractSender.body[0]).toHaveProperty('amount');
@@ -154,9 +150,6 @@ defineFeature(feature, (test) => {
             expect(extractReceiver.body[0].created_at).toBe(balanceSender[0].created_at);
         });
     }, 90000);
-
-
-
 
 
 

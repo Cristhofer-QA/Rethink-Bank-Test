@@ -44,5 +44,23 @@ module.exports = {
     extract_point: {
         method: 'get',
         path: '/points/extrato'
+    },
+    send_points_piggy_bank: {
+        method: 'post',
+        path: '/caixinha/deposit',
+        send: (amountSend) => ({
+            amount: amountSend
+        })
+    },
+    points_piggy_bank_extract: {
+        method: 'get',
+        path: '/caixinha/extrato'
+    },
+    withdraw_points_piggy_bank: {
+        method: 'post',
+        path: '/caixinha/withdraw',
+        send: (amountSend) => ({
+            amount: amountSend
+        })
     }
 };

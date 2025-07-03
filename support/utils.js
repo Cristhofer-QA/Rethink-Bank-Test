@@ -50,6 +50,24 @@ async function extractPoints(bearerToken = null) {
     return response;
 }
 
+async function sendPointsPiggyBank(send, bearerToken = null) {
+    const client = createClient(bearerToken);
+    const response = await client[endpoints.send_points_piggy_bank.method](endpoints.send_points_piggy_bank.path).send(send);
+    return response;
+}
+
+async function pointsPiggyBankExtract(bearerToken = null) {
+    const client = createClient(bearerToken);
+    const response = await client[endpoints.points_piggy_bank_extract.method](endpoints.points_piggy_bank_extract.path);
+    return response;
+}
+
+async function withdrawPointsPiggyBank(send, bearerToken = null) {
+    const client = createClient(bearerToken);
+    const response = await client[endpoints.withdraw_points_piggy_bank.method](endpoints.withdraw_points_piggy_bank.path).send(send);
+    return response;
+}
+
 
 module.exports = {
     login,
@@ -59,4 +77,7 @@ module.exports = {
     registerUser,
     extractPoints,
     generalBalance,
+    sendPointsPiggyBank,
+    pointsPiggyBankExtract,
+    withdrawPointsPiggyBank,
 };
